@@ -1,5 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using VideoLibrary.DataTransferObjects.User;
 using VideoLibrary.Models;
 
 namespace VideoLibrary.Controllers
@@ -9,10 +15,13 @@ namespace VideoLibrary.Controllers
     public class UserController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public UserController(AppDbContext context)
+
+        public UserController(AppDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         // GET: api/user
@@ -27,6 +36,7 @@ namespace VideoLibrary.Controllers
         // GET: api/user/5
         // Returns one user by their ID
         // Useful when showing a profile or editing data
+        [Authorize]
         [HttpGet("{id:int}")]
         public async Task<ActionResult<User>> GetById(int id)
         {
@@ -84,6 +94,59 @@ namespace VideoLibrary.Controllers
 
             return NoContent();
         }
-        
+
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] LoginDto login)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Username == login.Username && u.Password == login.Password);
+            if (user == null || user.IsDeleted)
+                return Unauthorized("Neispravni kredencijali.");
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim("UserId", user.Id.ToString()),
+            new Claim(ClaimTypes.Role, user.Admin ? "Admin" : "User")
+                }),
+                Expires = DateTime.UtcNow.AddHours(24),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var jwt = tokenHandler.WriteToken(token);
+
+            return Ok(new { token = jwt });
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+        {
+            if (await _context.Users.AnyAsync(u => u.Username == dto.Username))
+                return BadRequest("Username već postoji");
+            else if(await _context.Users.AnyAsync(u=> u.Email == dto.Email))
+                return BadRequest("Email već postoji");
+
+
+            var user = new User
+                {
+                    Username = dto.Username,
+                    Password = dto.Password,
+                    Email = dto.Email,
+                    Name = dto.Name,
+                    Dob = dto.Dob,
+                    Admin = false,
+                    IsDeleted = false
+                };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return Ok("Registracija uspješna");
+        }
+
+
     }
 }
