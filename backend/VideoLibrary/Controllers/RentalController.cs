@@ -25,7 +25,7 @@ namespace VideoLibrary.Controllers
                 .Include(r => r.BorrowedBy)
                 .Include(r => r.BorrowedTo)
                 .Include(r => r.MovieCopy)
-                .ToListAsync();
+                .Where(r=>!r.IsDeleted).ToListAsync();
         }
 
         // GET: api/rental/5
@@ -80,7 +80,7 @@ namespace VideoLibrary.Controllers
         // DELETE: api/rental/5
         // Deletes a rental record by ID.
         // Soft delete is implemented by marking the rental as deleted
-        /*[HttpDelete("{id:int}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
             var rental = await _context.Rentals.FindAsync(id);
@@ -88,10 +88,11 @@ namespace VideoLibrary.Controllers
                 return NotFound();
 
             rental.IsDeleted = true;
+            rental.DeleteDate = DateTime.Now;
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
-        */
+        
     }
 }

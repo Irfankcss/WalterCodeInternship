@@ -21,7 +21,7 @@ namespace VideoLibrary.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Movie>>> GetAllMovies()
         {
-            return await _context.Movies.ToListAsync();
+            return await _context.Movies.Where(m=> !m.IsDeleted).ToListAsync();
         }
 
         // GET: api/movie/5
@@ -74,7 +74,7 @@ namespace VideoLibrary.Controllers
         // DELETE: api/movie/5
         // Deletes a movie by ID.
         // Soft delete is implemented by marking the movie as deleted
-        /*[HttpDelete("{id:int}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
             var movie = await _context.Movies.FindAsync(id);
@@ -82,10 +82,11 @@ namespace VideoLibrary.Controllers
                 return NotFound();
 
             movie.IsDeleted = true;
+            movie.DeleteDate = DateTime.Now;
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
-        */
+        
     }
 }

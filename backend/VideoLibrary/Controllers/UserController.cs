@@ -71,7 +71,7 @@ namespace VideoLibrary.Controllers
         // DELETE: api/user/5
         // Deletes a user by ID.
         // Soft delete is implemented by marking the user as deleted
-        /*[HttpDelete("{id:int}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
             var user = await _context.Users.FindAsync(id);
@@ -79,10 +79,11 @@ namespace VideoLibrary.Controllers
                 return NotFound();
 
             user.IsDeleted = true;
+            user.DeleteDate = DateTime.Now;
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
-        */
+        
     }
 }

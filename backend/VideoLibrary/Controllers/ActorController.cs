@@ -21,7 +21,7 @@ namespace VideoLibrary.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Actor>>> GetAllActors()
         {
-            return await _context.Actors.ToListAsync();
+            return await _context.Actors.Where(a=> !a.IsDeleted).ToListAsync();
         }
 
         // GET: api/actor/5
@@ -71,18 +71,19 @@ namespace VideoLibrary.Controllers
         //DELETE: api/actor/5
         // Deletes an actor by ID.
         // Soft delete is implemented by marking the actor as deleted
-        ///*[HttpDelete("{id:int}")]
-        //public async Task<IActionResult> Delete(int id)
-        //{
-        //    var actor = await _context.Actors.FindAsync(id);
-        //    if (actor == null)
-        //        return NotFound();
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var actor = await _context.Actors.FindAsync(id);
+            if (actor == null)
+                return NotFound();
 
-        //    actor.IsDeleted = true;
-        //    await _context.SaveChangesAsync();
+            actor.IsDeleted = true;
+            actor.DeleteDate = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
 
-        //    return NoContent();
-        //}
-        //*/
+            return NoContent();
+        }
+        
     }
 }

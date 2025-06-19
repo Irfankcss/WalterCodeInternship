@@ -21,7 +21,7 @@ namespace VideoLibrary.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Director>>> GetAll()
         {
-            return await _context.Directors.ToListAsync();
+            return await _context.Directors.Where(d=> !d.IsDeleted).ToListAsync();
         }
 
         // GET: api/director/5
@@ -71,7 +71,7 @@ namespace VideoLibrary.Controllers
         // DELETE: api/director/5
         // Deletes a director by ID.
         // Soft delete is implemented by marking the director as deleted
-        /* [HttpDelete("{id:int}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
             var director = await _context.Directors.FindAsync(id);
@@ -79,10 +79,11 @@ namespace VideoLibrary.Controllers
                 return NotFound();
 
             director.IsDeleted = true;
+            director.DeleteDate = DateTime.Now;
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
-        */
+        
     }
 }

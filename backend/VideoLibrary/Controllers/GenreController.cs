@@ -20,7 +20,7 @@ namespace VideoLibrary.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Genre>>> GetAllGenres()
         {
-            return await _context.Genres.ToListAsync();
+            return await _context.Genres.Where(g=>!g.IsDeleted).ToListAsync();
         }
 
         // GET: api/genre/5
@@ -67,7 +67,7 @@ namespace VideoLibrary.Controllers
         // DELETE: api/genre/5
         // Deletes a genre by ID.
         // Soft delete is implemented by marking the genre as deleted
-        /*[HttpDelete("{id:int}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
             var genre = await _context.Genres.FindAsync(id);
@@ -75,10 +75,11 @@ namespace VideoLibrary.Controllers
                 return NotFound();
 
             genre.IsDeleted = true;
+            genre.DeleteDate = DateTime.Now;
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
-        */
+        
     }
 }
