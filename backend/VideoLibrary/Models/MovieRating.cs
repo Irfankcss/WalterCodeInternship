@@ -3,17 +3,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace VideoLibrary.Models
 {
-    public class MovieCopy
+    public class MovieRating
     {
-        public int Id { get; set; }
-        [ForeignKey(nameof(MovieId))]
         public int MovieId { get; set; }
         public Movie Movie { get; set; }
+
+        public int UserId { get; set; }
+        public User User { get; set; }
+
         [Required]
-        public string SerialNumber { get; set; }
-        public string Description { get; set; }
+        public int Rating { get; set; }
+        public string? Comment { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime? DeleteDate { get; set; }
-
     }
 }

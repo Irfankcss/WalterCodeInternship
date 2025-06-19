@@ -19,7 +19,7 @@ namespace VideoLibrary.Controllers
         // Returns all movie ratings
         // Useful when displaying global reviews or statistics
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MovieRatings>>> GetAll()
+        public async Task<ActionResult<IEnumerable<MovieRating>>> GetAll()
         {
             return await _context.MovieRatings.ToListAsync();
         }
@@ -28,7 +28,7 @@ namespace VideoLibrary.Controllers
         // Returns a specific rating given by a user for a movie
         // Useful for showing/editing the user's personal review
         [HttpGet("movie/{movieId:int}/user/{userId:int}")]
-        public async Task<ActionResult<MovieRatings>> GetByMovieAndUser(int movieId, int userId)
+        public async Task<ActionResult<MovieRating>> GetByMovieAndUser(int movieId, int userId)
         {
             var rating = await _context.MovieRatings
                 .FirstOrDefaultAsync(r => r.MovieId == movieId && r.UserId == userId);
@@ -43,7 +43,7 @@ namespace VideoLibrary.Controllers
         // Adds a new rating for a movie by a user.
         // Called when a user submits a new review
         [HttpPost]
-        public async Task<ActionResult<MovieRatings>> Create([FromBody] MovieRatings rating)
+        public async Task<ActionResult<MovieRating>> Create([FromBody] MovieRating rating)
         {
             _context.MovieRatings.Add(rating);
             await _context.SaveChangesAsync();
@@ -55,7 +55,7 @@ namespace VideoLibrary.Controllers
         // Updates an existing rating and/or comment
         // Useful when a user edits their previous review
         [HttpPut("movie/{movieId:int}/user/{userId:int}")]
-        public async Task<IActionResult> Update(int movieId, int userId, [FromBody] MovieRatings updatedRating)
+        public async Task<IActionResult> Update(int movieId, int userId, [FromBody] MovieRating updatedRating)
         {
             if (movieId != updatedRating.MovieId || userId != updatedRating.UserId)
                 return BadRequest("ID mismatch.");

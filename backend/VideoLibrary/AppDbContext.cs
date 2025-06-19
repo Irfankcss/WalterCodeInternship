@@ -20,7 +20,7 @@ namespace VideoLibrary
             modelBuilder.Entity<GenreHasMovie>()
                 .HasKey(gm => new { gm.GenreId, gm.MovieId });
 
-            modelBuilder.Entity<MovieRatings>()
+            modelBuilder.Entity<MovieRating>()
                 .HasKey(mr => new { mr.MovieId, mr.UserId });
 
             modelBuilder.Entity<MovieCopy>()
@@ -52,7 +52,7 @@ namespace VideoLibrary
             public DbSet<Actor> Actors { get; set; }
             public DbSet<Director> Directors { get; set; }
             public DbSet<User> Users { get; set; }
-            public DbSet<MovieRatings> MovieRatings { get; set; }
+            public DbSet<MovieRating> MovieRatings { get; set; }
             public DbSet<MovieCopy> MovieCopies { get; set; }
             public DbSet<Rental> Rentals { get; set; }
             public DbSet<MovieHasActor> MovieHasActors { get; set; }
