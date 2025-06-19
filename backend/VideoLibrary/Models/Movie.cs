@@ -20,5 +20,6 @@ namespace VideoLibrary.Models
         public User EditedBy { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime? DeleteDate { get; set; }
+        public List<MovieCopy> MovieCopies { get; set; } = new List<MovieCopy>();
     }
 }

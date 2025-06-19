@@ -25,7 +25,7 @@ namespace VideoLibrary
 
             modelBuilder.Entity<MovieCopy>()
                 .HasOne(mc => mc.Movie)
-                .WithMany()
+                .WithMany(m=> m.MovieCopies)
                 .HasForeignKey(mc => mc.MovieId);
 
             modelBuilder.Entity<Rental>()
