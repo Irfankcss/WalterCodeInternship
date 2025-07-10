@@ -24,18 +24,21 @@ namespace VideoLibrary.Controllers
             return await _context.MovieCopies.Where(m=> !m.IsDeleted).ToListAsync();
         }
 
-        // GET: api/moviecopy/5
-        // Returns a single movie copy by ID
-        // Helpful when editing or inspecting specific copy details
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<MovieCopy>> GetById(int id)
+        // GET: api/moviecopy/by-movie/5
+        // Returns all movie copies for the specified movie ID
+        [HttpGet("by-movie/{movieId:int}")]
+        public async Task<ActionResult<IEnumerable<MovieCopy>>> GetMovieCopiesByMovieId(int movieId)
         {
-            var copy = await _context.MovieCopies.FindAsync(id);
-            if (copy == null)
+            var copies = await _context.MovieCopies
+                .Where(mc => mc.MovieId == movieId)
+                .ToListAsync();
+
+            if (copies == null || !copies.Any())
                 return NotFound();
 
-            return copy;
+            return Ok(copies);
         }
+
 
         // POST: api/moviecopy
         // Adds a new movie copy to the database

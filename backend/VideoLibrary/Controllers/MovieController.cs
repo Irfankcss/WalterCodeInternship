@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using VideoLibrary.DTOs;
 using VideoLibrary.Models;
 
 namespace VideoLibrary.Controllers
@@ -30,7 +31,11 @@ namespace VideoLibrary.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Movie>> GetMovieById(int id)
         {
-            var movie = await _context.Movies.FindAsync(id);
+            var movie = await _context.Movies
+                .Include(m => m.Director)
+                .Include(m => m.EditedBy)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
             if (movie == null)
                 return NotFound();
 
@@ -38,38 +43,66 @@ namespace VideoLibrary.Controllers
         }
 
         // POST: api/movie
-        // Adds a new movie to the database
-        // Called when creating a new movie from the frontend
+        // Creates a new movie and links it to existing actors, genres, director and editor by their IDs
         [HttpPost]
-        public async Task<ActionResult<Movie>> CreateMovie([FromBody] Movie movie)
+        public async Task<ActionResult<Movie>> CreateMovie([FromBody] MovieCreateDto dto)
         {
-            if (movie == null)
-                return BadRequest("Movie cannot be null.");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            _context.Movies.Add(movie);
+            var movie = new Movie
+            {
+                Name = dto.Name,
+                Year = dto.Year,
+                ImdbId = dto.ImdbId,
+                ImdbRating = dto.ImdbRating,
+                Poster = dto.Poster,
+                DirectorId = dto.DirectorId,
+                EditedById = dto.EditedById
+            };
+
+            foreach (var actorId in dto.ActorIds)
+            {
+                _context.MovieHasActors.Add(new MovieHasActor
+                {
+                    MovieId = movie.Id,
+                    ActorId = actorId,
+                    MovieDirectorId = dto.DirectorId,
+                    MainActor = false
+                });
+            }
+            foreach (var genreId in dto.GenreIds)
+            {
+                _context.GenreHasMovies.Add(new GenreHasMovie
+                {
+                    MovieId = movie.Id,
+                    GenreId = genreId
+                });
+            }
+
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetMovieById), new { id = movie.Id }, movie);
         }
 
+
         // PUT: api/movie/5
         // Updates an existing movie with the specified ID
         // Used when editing movie details from the admin interface
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateMovie(int id, [FromBody] Movie updatedMovie)
+        public async Task<IActionResult> UpdateMovie(int id, [FromBody] MovieUpdateDto dto)
         {
-            if (id != updatedMovie.Id)
-                return BadRequest("ID mismatch");
-
-            var exists = await _context.Movies.AnyAsync(m => m.Id == id);
-            if (!exists)
+            var movie = await _context.Movies.FindAsync(id);
+            if (movie == null)
                 return NotFound();
 
-            _context.Entry(updatedMovie).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            movie.ImdbRating = dto.ImdbRating;
+            movie.Poster = dto.Poster;
 
+            await _context.SaveChangesAsync();
             return NoContent();
         }
+
 
         // DELETE: api/movie/5
         // Deletes a movie by ID.
