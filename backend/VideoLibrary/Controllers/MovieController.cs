@@ -22,7 +22,8 @@ namespace VideoLibrary.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Movie>>> GetAllMovies()
         {
-            return await _context.Movies.Where(m=> !m.IsDeleted).ToListAsync();
+            return await _context.Movies.Include(m => m.Director)
+                .Include(m => m.EditedBy).Where(m=> !m.IsDeleted).ToListAsync();
         }
 
         // GET: api/movie/5
@@ -61,6 +62,9 @@ namespace VideoLibrary.Controllers
                 EditedById = dto.EditedById
             };
 
+            _context.Movies.Add(movie);
+            await _context.SaveChangesAsync();
+
             foreach (var actorId in dto.ActorIds)
             {
                 _context.MovieHasActors.Add(new MovieHasActor
@@ -71,6 +75,7 @@ namespace VideoLibrary.Controllers
                     MainActor = false
                 });
             }
+
             foreach (var genreId in dto.GenreIds)
             {
                 _context.GenreHasMovies.Add(new GenreHasMovie

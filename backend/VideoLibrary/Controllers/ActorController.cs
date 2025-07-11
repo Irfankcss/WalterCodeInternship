@@ -36,6 +36,17 @@ namespace VideoLibrary.Controllers
 
             return actor;
         }
+        [HttpGet("GetByMovieID")]
+        public async Task<ActionResult<IEnumerable<Actor>>> GetActorsByMovieId(int MovieId)
+        {
+            var actors = await _context.MovieHasActors
+                .Where(ma => ma.MovieId == MovieId && !ma.Actor.IsDeleted)
+                .Select(ma => ma.Actor)
+                .ToListAsync();
+            if (actors == null || !actors.Any())
+                return NotFound();
+            return Ok(actors);
+        }
 
         // POST: api/actor
         // Adds a new actor to the database
