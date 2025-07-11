@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using VideoLibrary.DTOs;
 using VideoLibrary.Models;
 
 namespace VideoLibrary.Controllers
@@ -39,17 +40,22 @@ namespace VideoLibrary.Controllers
             return Ok(copies);
         }
 
-
         // POST: api/moviecopy
-        // Adds a new movie copy to the database
-        // Called when registering a new physical or digital copy
+        // Adds a new movie copy using only MovieId, not entire Movie object
         [HttpPost]
-        public async Task<ActionResult<MovieCopy>> Create([FromBody] MovieCopy copy)
+        public async Task<ActionResult<MovieCopy>> Create([FromBody] MovieCopyCreateDto dto)
         {
+            var copy = new MovieCopy
+            {
+                MovieId = dto.MovieId,
+                SerialNumber = dto.SerialNumber,
+                Description = dto.Description
+            };
+
             _context.MovieCopies.Add(copy);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetById), new { id = copy.Id }, copy);
+            return CreatedAtAction(nameof(GetMovieCopiesByMovieId), new { id = copy.Id }, copy);
         }
 
         // PUT: api/moviecopy/5
