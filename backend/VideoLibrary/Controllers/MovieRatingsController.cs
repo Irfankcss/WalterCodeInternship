@@ -67,18 +67,19 @@ namespace VideoLibrary.Controllers
         [HttpPut("movie/{movieId:int}/user/{userId:int}")]
         public async Task<IActionResult> Update(int movieId, int userId, [FromBody] MovieRatingCreateDto updatedRating)
         {
-            if (movieId != updatedRating.MovieId || userId != updatedRating.UserId)
-                return BadRequest("ID mismatch.");
+            var rating = await _context.MovieRatings
+                .FirstOrDefaultAsync(r => r.MovieId == movieId && r.UserId == userId);
 
-            var exists = await _context.MovieRatings.AnyAsync(r => r.MovieId == movieId && r.UserId == userId);
-            if (!exists)
+            if (rating == null)
                 return NotFound();
 
-            _context.Entry(updatedRating).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            rating.Rating = updatedRating.Rating;
+            rating.Comment = updatedRating.Comment;
 
+            await _context.SaveChangesAsync();
             return NoContent();
         }
+        
 
         // DELETE: api/movierating/{movieId}/{userId}
         // Deletes a movie rating by movie ID and user ID.

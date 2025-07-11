@@ -47,7 +47,7 @@ namespace VideoLibrary.Controllers
         {
             var copy = new MovieCopy
             {
-                MovieId = dto.MovieId,
+                MovieId = dto.MovieId,                                                                                                                                                                      
                 SerialNumber = dto.SerialNumber,
                 Description = dto.Description
             };

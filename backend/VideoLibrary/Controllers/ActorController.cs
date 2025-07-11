@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using VideoLibrary.Dtos;
 using VideoLibrary.DTOs;
 using VideoLibrary.Models;
 
@@ -67,24 +68,24 @@ namespace VideoLibrary.Controllers
             return CreatedAtAction(nameof(GetActorById), new { id = newActor.Id }, newActor);
         }
 
-        // PUT: api/actor/5
+        // PUT: api/actor?id=5
         // Updates an existing actor by ID
         // This is used when a user edits an actor's information
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateActor(int id, [FromBody] Actor updatedActor)
+        public async Task<IActionResult> Update(int id, [FromBody] ActorUpdateDto dto)
         {
-            if (id != updatedActor.Id)
-                return BadRequest("ID mismatch");
-
-            var exists = await _context.Actors.AnyAsync(a => a.Id == id);
-            if (!exists)
+            var actor = await _context.Actors.FindAsync(id);
+            if (actor == null)
                 return NotFound();
 
-            _context.Entry(updatedActor).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            actor.Name = dto.Name;
+            actor.Dob = dto.Dob;
+            actor.Bio = dto.Bio;
 
+            await _context.SaveChangesAsync();
             return NoContent();
         }
+
 
         //DELETE: api/actor/5
         // Deletes an actor by ID.

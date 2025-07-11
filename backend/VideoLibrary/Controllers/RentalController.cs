@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using VideoLibrary.Dtos;
 using VideoLibrary.DTOs;
 using VideoLibrary.Models;
 
@@ -72,20 +73,19 @@ namespace VideoLibrary.Controllers
         // Updates an existing rental record
         // Can be used to extend return date or fix user input errors
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Rental updatedRental)
+        public async Task<IActionResult> Update(int id, [FromBody] RentalUpdateDto dto)
         {
-            if (id != updatedRental.Id)
-                return BadRequest("ID in URL does not match rental ID.");
-
-            var exists = await _context.Rentals.AnyAsync(r => r.Id == id);
-            if (!exists)
+            var rental = await _context.Rentals.FindAsync(id);
+            if (rental == null)
                 return NotFound();
 
-            _context.Entry(updatedRental).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            rental.Date = dto.Date;
+            rental.ReturnDate = dto.ReturnDate;
 
+            await _context.SaveChangesAsync();
             return NoContent();
         }
+
 
         // DELETE: api/rental/5
         // Deletes a rental record by ID.

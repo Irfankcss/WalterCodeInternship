@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using VideoLibrary.Dtos;
 using VideoLibrary.Models;
 
 namespace VideoLibrary.Controllers
@@ -53,20 +54,21 @@ namespace VideoLibrary.Controllers
         // Updates an existing director by ID
         // Used when a user edits a director's information
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Director updatedDirector)
+        public async Task<IActionResult> Update(int id, [FromBody] DirectorUpdateDto dto)
         {
-            if (id != updatedDirector.Id)
-                return BadRequest("ID u URL-u i objektu se ne poklapaju.");
-
-            var exists = await _context.Directors.AnyAsync(d => d.Id == id);
-            if (!exists)
+            var director = await _context.Directors.FindAsync(id);
+            if (director == null)
                 return NotFound();
 
-            _context.Entry(updatedDirector).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            director.Name = dto.Name;
+            director.Dob = dto.Dob;
+            director.Bio = dto.Bio;
 
+            await _context.SaveChangesAsync();
             return NoContent();
         }
+
+
 
         // DELETE: api/director/5
         // Deletes a director by ID.

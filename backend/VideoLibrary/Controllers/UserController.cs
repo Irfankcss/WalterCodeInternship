@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using VideoLibrary.DataTransferObjects.User;
+using VideoLibrary.Dtos;
 using VideoLibrary.Models;
 
 namespace VideoLibrary.Controllers
@@ -63,20 +64,23 @@ namespace VideoLibrary.Controllers
         // Updates an existing user's data
         // Can be used by admin or for profile editing
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, [FromBody] User updatedUser)
+        public async Task<IActionResult> Update(int id, [FromBody] UserUpdateDto dto)
         {
-            if (id != updatedUser.Id)
-                return BadRequest("ID in URL doesn't match ID in body.");
-
-            var exists = await _context.Users.AnyAsync(u => u.Id == id);
-            if (!exists)
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
                 return NotFound();
 
-            _context.Entry(updatedUser).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            user.Username = dto.Username;
+            user.Password = dto.Password;
+            user.Email = dto.Email;
+            user.Name = dto.Name;
+            user.Dob = dto.Dob;
+            user.Admin = dto.Admin;
 
+            await _context.SaveChangesAsync();
             return NoContent();
         }
+
 
         // DELETE: api/user/5
         // Deletes a user by ID.

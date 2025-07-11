@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using VideoLibrary.Dtos;
 using VideoLibrary.Models;
 
 namespace VideoLibrary.Controllers
@@ -50,19 +51,20 @@ namespace VideoLibrary.Controllers
         // This updates a genre with the given ID
         // Used when we want to change the name or description of a genre
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateGenre(int id, [FromBody] Genre updatedGenre)
+        public async Task<IActionResult> UpdateGenre(int id, [FromBody] GenreUpdateDto dto)
         {
-            if (id != updatedGenre.Id)
-                return BadRequest("ID mismatch"); 
+            var genre = await _context.Genres.FindAsync(id);
+            if (genre == null)
+                return NotFound();
 
-            var exists = await _context.Genres.AnyAsync(g => g.Id == id);
-            if (!exists)
-                return NotFound(); 
+            genre.Name = dto.Name;
+            genre.Description = dto.Description;
 
-            _context.Entry(updatedGenre).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return NoContent(); 
+            return NoContent();
         }
+
+
 
         // DELETE: api/genre/5
         // Deletes a genre by ID.
