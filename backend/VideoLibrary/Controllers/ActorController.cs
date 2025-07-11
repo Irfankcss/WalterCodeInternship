@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using VideoLibrary.DTOs;
 using VideoLibrary.Models;
 
 namespace VideoLibrary.Controllers
@@ -52,12 +53,18 @@ namespace VideoLibrary.Controllers
         // Adds a new actor to the database
         // Used when creating a new actor from a form
         [HttpPost]
-        public async Task<ActionResult<Actor>> CreateActor([FromBody] Actor actor)
+        public async Task<ActionResult<Actor>> CreateActor([FromBody] CreateActorDto actor)
         {
-            _context.Actors.Add(actor);
+            var newActor = new Actor
+            {
+                Name = actor.Name,
+                Dob = actor.Dob,
+                Bio = actor.Bio,
+            };
+            _context.Actors.Add(newActor);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetActorById), new { id = actor.Id }, actor);
+            return CreatedAtAction(nameof(GetActorById), new { id = newActor.Id }, newActor);
         }
 
         // PUT: api/actor/5
