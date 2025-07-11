@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using VideoLibrary.DTOs;
 using VideoLibrary.Models;
 
 namespace VideoLibrary.Controllers
@@ -47,16 +48,25 @@ namespace VideoLibrary.Controllers
         }
 
         // POST: api/rental
-        // Creates a new rental record
-        // Used when a movie is borrowed by a user
+        // Creates a rental using only ID references for users and movie copy
         [HttpPost]
-        public async Task<ActionResult<Rental>> Create([FromBody] Rental rental)
+        public async Task<ActionResult<Rental>> Create([FromBody] RentalCreateDto dto)
         {
+            var rental = new Rental
+            {
+                Date = dto.Date,
+                ReturnDate = dto.ReturnDate,
+                BorrowedToId = dto.BorrowedToId,
+                MovieCopyId = dto.MovieCopyId,
+                BorrowedById = dto.BorrowedById
+            };
+
             _context.Rentals.Add(rental);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetById), new { id = rental.Id }, rental);
         }
+
 
         // PUT: api/rental/5
         // Updates an existing rental record

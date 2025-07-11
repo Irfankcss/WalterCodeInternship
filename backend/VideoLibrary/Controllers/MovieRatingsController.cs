@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using VideoLibrary.DTOs;
 using VideoLibrary.Models;
 
 namespace VideoLibrary.Controllers
@@ -43,19 +44,28 @@ namespace VideoLibrary.Controllers
         // Adds a new rating for a movie by a user.
         // Called when a user submits a new review
         [HttpPost]
-        public async Task<ActionResult<MovieRating>> Create([FromBody] MovieRating rating)
+        public async Task<ActionResult<MovieRating>> Create([FromBody] MovieRatingCreateDto dto)
         {
+            var rating = new MovieRating
+            {
+                MovieId = dto.MovieId,
+                UserId = dto.UserId,
+                Rating = dto.Rating,
+                Comment = dto.Comment
+            };
+
             _context.MovieRatings.Add(rating);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetByMovieAndUser), new { movieId = rating.MovieId, userId = rating.UserId }, rating);
+            return CreatedAtAction(nameof(GetByMovieAndUser), new { movieId = dto.MovieId, userId = dto.UserId }, rating);
         }
+
 
         // PUT: api/movieratings/movie/5/user/3
         // Updates an existing rating and/or comment
         // Useful when a user edits their previous review
         [HttpPut("movie/{movieId:int}/user/{userId:int}")]
-        public async Task<IActionResult> Update(int movieId, int userId, [FromBody] MovieRating updatedRating)
+        public async Task<IActionResult> Update(int movieId, int userId, [FromBody] MovieRatingCreateDto updatedRating)
         {
             if (movieId != updatedRating.MovieId || userId != updatedRating.UserId)
                 return BadRequest("ID mismatch.");
