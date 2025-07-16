@@ -36,6 +36,22 @@ namespace VideoLibrary.Controllers
             return genre;
         }
 
+        //Filmovi po zanru
+        [HttpGet("{GenreId:int}/movies")]
+        public async Task<ActionResult<IEnumerable<Movie>>> GetMoviesByGenre(int GenreId)
+        {
+            var movies = await _context.GenreHasMovies
+                .Where(gm => gm.GenreId == GenreId && !gm.Movie.IsDeleted)
+                .Include(gm => gm.Movie)
+                    .ThenInclude(m => m.Director)
+                .Include(gm => gm.Movie)
+                    .ThenInclude(m => m.EditedBy)
+                .Select(gm => gm.Movie)
+                .ToListAsync();
+
+            return movies;
+        }
+
         // POST: api/genre
         // This adds a new genre to the database
         // It's used when we submit a form to create a new genre

@@ -22,8 +22,13 @@ namespace VideoLibrary.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Movie>>> GetAllMovies()
         {
-            return await _context.Movies.Include(m => m.Director)
-                .Include(m => m.EditedBy).Where(m=> !m.IsDeleted).ToListAsync();
+            return await _context.Movies
+                .Where(m => !m.IsDeleted)
+                .Include(m => m.Director)
+                .Include(m => m.EditedBy)
+                .Include(m => m.MovieCopies)
+                    
+                .ToListAsync();
         }
 
         // GET: api/movie/5
@@ -41,6 +46,19 @@ namespace VideoLibrary.Controllers
                 return NotFound();
 
             return movie;
+        }
+
+        //Zanrovi po filmu
+        [HttpGet("{id:int}/genres")]
+        public async Task<ActionResult<IEnumerable<Genre>>> GetGenresByMovie(int id)
+        {
+            var genres = await _context.GenreHasMovies
+                .Where(gm => gm.MovieId == id && !gm.Genre.IsDeleted)
+                .Include(gm => gm.Genre)
+                .Select(gm => gm.Genre)
+                .ToListAsync();
+
+            return genres;
         }
 
         // POST: api/movie
@@ -125,6 +143,6 @@ namespace VideoLibrary.Controllers
 
             return NoContent();
         }
-        
+
     }
 }
