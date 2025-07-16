@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VideoLibrary.Dtos;
 using VideoLibrary.Models;
@@ -41,6 +42,7 @@ namespace VideoLibrary.Controllers
         // POST: api/director
         // Creates a new director entry in the database
         // Typically used when a user submits a form to add a new director
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Director>> Create([FromBody] Director director)
         {
@@ -53,6 +55,7 @@ namespace VideoLibrary.Controllers
         // PUT: api/director/5
         // Updates an existing director by ID
         // Used when a user edits a director's information
+        [Authorize]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] DirectorUpdateDto dto)
         {
@@ -73,6 +76,7 @@ namespace VideoLibrary.Controllers
         // DELETE: api/director/5
         // Deletes a director by ID.
         // Soft delete is implemented by marking the director as deleted
+        [Authorize]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {

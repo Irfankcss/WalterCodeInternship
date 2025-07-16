@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VideoLibrary.Dtos;
 using VideoLibrary.DTOs;
@@ -50,6 +51,7 @@ namespace VideoLibrary.Controllers
 
         // POST: api/rental
         // Creates a rental using only ID references for users and movie copy
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Rental>> Create([FromBody] RentalCreateDto dto)
         {
@@ -72,6 +74,7 @@ namespace VideoLibrary.Controllers
         // PUT: api/rental/5
         // Updates an existing rental record
         // Can be used to extend return date or fix user input errors
+        [Authorize]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] RentalUpdateDto dto)
         {
@@ -90,6 +93,7 @@ namespace VideoLibrary.Controllers
         // DELETE: api/rental/5
         // Deletes a rental record by ID.
         // Soft delete is implemented by marking the rental as deleted
+        [Authorize]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {

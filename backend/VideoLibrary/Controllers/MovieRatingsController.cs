@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VideoLibrary.DTOs;
 using VideoLibrary.Models;
@@ -43,6 +44,7 @@ namespace VideoLibrary.Controllers
         // POST: api/movieratings
         // Adds a new rating for a movie by a user.
         // Called when a user submits a new review
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<MovieRating>> Create([FromBody] MovieRatingCreateDto dto)
         {
@@ -64,6 +66,7 @@ namespace VideoLibrary.Controllers
         // PUT: api/movieratings/movie/5/user/3
         // Updates an existing rating and/or comment
         // Useful when a user edits their previous review
+        [Authorize]
         [HttpPut("movie/{movieId:int}/user/{userId:int}")]
         public async Task<IActionResult> Update(int movieId, int userId, [FromBody] MovieRatingCreateDto updatedRating)
         {
@@ -79,11 +82,12 @@ namespace VideoLibrary.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
-        
+
 
         // DELETE: api/movierating/{movieId}/{userId}
         // Deletes a movie rating by movie ID and user ID.
         // Soft delete is implemented by marking the rating as deleted
+        [Authorize]
         [HttpDelete("{movieId:int}/{userId:int}")]
         public async Task<IActionResult> Delete(int movieId, int userId)
         {

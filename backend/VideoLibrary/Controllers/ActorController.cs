@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VideoLibrary.Dtos;
 using VideoLibrary.DTOs;
@@ -53,6 +54,7 @@ namespace VideoLibrary.Controllers
         // POST: api/actor
         // Adds a new actor to the database
         // Used when creating a new actor from a form
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Actor>> CreateActor([FromBody] CreateActorDto actor)
         {
@@ -71,6 +73,7 @@ namespace VideoLibrary.Controllers
         // PUT: api/actor?id=5
         // Updates an existing actor by ID
         // This is used when a user edits an actor's information
+        [Authorize]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] ActorUpdateDto dto)
         {
@@ -90,6 +93,7 @@ namespace VideoLibrary.Controllers
         //DELETE: api/actor/5
         // Deletes an actor by ID.
         // Soft delete is implemented by marking the actor as deleted
+        [Authorize]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {

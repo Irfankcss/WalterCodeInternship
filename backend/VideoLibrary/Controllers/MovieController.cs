@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VideoLibrary.DTOs;
 using VideoLibrary.Models;
@@ -111,6 +112,7 @@ namespace VideoLibrary.Controllers
 
         // POST: api/movie
         // Creates a new movie and links it to existing actors, genres, director and editor by their IDs
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Movie>> CreateMovie([FromBody] MovieCreateDto dto)
         {
@@ -160,6 +162,7 @@ namespace VideoLibrary.Controllers
         // PUT: api/movie/5
         // Updates an existing movie with the specified ID
         // Used when editing movie details from the admin interface
+        [Authorize]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateMovie(int id, [FromBody] MovieUpdateDto dto)
         {
@@ -178,6 +181,7 @@ namespace VideoLibrary.Controllers
         // DELETE: api/movie/5
         // Deletes a movie by ID.
         // Soft delete is implemented by marking the movie as deleted
+        [Authorize]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {

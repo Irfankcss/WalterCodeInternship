@@ -53,7 +53,6 @@ namespace VideoLibrary.Controllers
         // GET: api/user/5
         // Returns one user by their ID
         // Useful when showing a profile or editing data
-        [Authorize]
         [HttpGet("{id:int}")]
         public async Task<ActionResult<UserDto>> GetById(int id)
         {
@@ -79,6 +78,7 @@ namespace VideoLibrary.Controllers
         // POST: api/user
         // Creates a new user
         // Could be used for registration (without auth for now)
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<User>> Create([FromBody] User user)
         {
@@ -91,6 +91,7 @@ namespace VideoLibrary.Controllers
         // PUT: api/user/5
         // Updates an existing user's data
         // Can be used by admin or for profile editing
+        [Authorize]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] UserUpdateDto dto)
         {
@@ -113,6 +114,7 @@ namespace VideoLibrary.Controllers
         // DELETE: api/user/5
         // Deletes a user by ID.
         // Soft delete is implemented by marking the user as deleted
+        [Authorize]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
