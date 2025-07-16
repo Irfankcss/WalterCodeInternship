@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -8,6 +9,7 @@ using System.Text;
 using VideoLibrary.DataTransferObjects.User;
 using VideoLibrary.Dtos;
 using VideoLibrary.DTOs;
+using VideoLibrary.Helpers;
 using VideoLibrary.Models;
 
 namespace VideoLibrary.Controllers
@@ -30,24 +32,49 @@ namespace VideoLibrary.Controllers
         // Returns a list of all users
         // Can be used by admin to manage users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetAll()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
         {
-            return await _context.Users.ToListAsync();
+            var users = await _context.Users
+                .Where(u => !u.IsDeleted)
+                .Select(u => new UserDto
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    Email = u.Email,
+                    Name = u.Name,
+                    Dob = u.Dob,
+                    Admin = u.Admin
+                }).ToListAsync();
+
+            return Ok(users);
         }
+
 
         // GET: api/user/5
         // Returns one user by their ID
         // Useful when showing a profile or editing data
         [Authorize]
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<User>> GetById(int id)
+        public async Task<ActionResult<UserDto>> GetById(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _context.Users
+                .Where(u => u.Id == id && !u.IsDeleted)
+                .Select(u => new UserDto
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    Email = u.Email,
+                    Name = u.Name,
+                    Dob = u.Dob,
+                    Admin = u.Admin
+                }).FirstOrDefaultAsync();
+
             if (user == null)
                 return NotFound();
 
-            return user;
+            return Ok(user);
         }
+
 
         // POST: api/user
         // Creates a new user
@@ -103,7 +130,8 @@ namespace VideoLibrary.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginDto login)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Username == login.Username && u.Password == login.Password);
+            var hashedPassword = PasswordHasher.Hash(login.Password);
+            var user = _context.Users.FirstOrDefault(u => u.Username == login.Username && u.Password == hashedPassword);
             if (user == null || user.IsDeleted)
                 return Unauthorized("Neispravni kredencijali.");
 
@@ -138,8 +166,8 @@ namespace VideoLibrary.Controllers
             var user = new User
                 {
                     Username = dto.Username,
-                    Password = dto.Password,
-                    Email = dto.Email,
+                    Password = PasswordHasher.Hash(dto.Password),
+                    Email = dto.Email,  
                     Name = dto.Name,
                     Dob = dto.Dob,
                     Admin = false,
