@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using VideoLibrary.DataTransferObjects.User;
 using VideoLibrary.Dtos;
+using VideoLibrary.DTOs;
 using VideoLibrary.Models;
 
 namespace VideoLibrary.Controllers

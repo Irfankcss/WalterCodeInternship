@@ -20,33 +20,81 @@ namespace VideoLibrary.Controllers
         // Returns a list of all movies in the system
         // This is useful when displaying all movies in a table or gallery
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Movie>>> GetAllMovies()
+        public async Task<ActionResult<IEnumerable<MovieDto>>> GetAllMovies()
         {
-            return await _context.Movies
+            var movies = await _context.Movies
                 .Where(m => !m.IsDeleted)
                 .Include(m => m.Director)
                 .Include(m => m.EditedBy)
                 .Include(m => m.MovieCopies)
-                    
                 .ToListAsync();
+
+            var movieDtos = movies.Select(m => new MovieDto
+            {
+                Id = m.Id,
+                Name = m.Name,
+                Year = m.Year,
+                ImdbId = m.ImdbId,
+                ImdbRating = m.ImdbRating,
+                Poster = m.Poster,
+                DirectorId = m.DirectorId,
+                Director = m.Director,
+                EditedById = m.EditedById,
+                EditedByUsername = m.EditedBy.Username,
+                MovieCopies = m.MovieCopies
+                    .Where(c => !c.IsDeleted)
+                    .Select(c => new MovieCopyDto
+                    {
+                        Id = c.Id,
+                        SerialNumber = c.SerialNumber,
+                        Description = c.Description
+                    }).ToList()
+            });
+
+            return Ok(movieDtos);
         }
+
 
         // GET: api/movie/5
         // Returns a single movie by ID
         // Used to load detailed info about a movie or prepare it for editing
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<Movie>> GetMovieById(int id)
+        public async Task<ActionResult<MovieDto>> GetMovieById(int id)
         {
             var movie = await _context.Movies
                 .Include(m => m.Director)
                 .Include(m => m.EditedBy)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(m => m.MovieCopies)
+                .FirstOrDefaultAsync(m => m.Id == id && !m.IsDeleted);
 
             if (movie == null)
                 return NotFound();
 
-            return movie;
+            var movieDto = new MovieDto
+            {
+                Id = movie.Id,
+                Name = movie.Name,
+                Year = movie.Year,
+                ImdbId = movie.ImdbId,
+                ImdbRating = movie.ImdbRating,
+                Poster = movie.Poster,
+                DirectorId = movie.DirectorId,
+                Director = movie.Director, 
+                EditedById = movie.EditedById,
+                EditedByUsername = movie.EditedBy.Username,
+                MovieCopies = movie.MovieCopies
+                    .Where(c => !c.IsDeleted)
+                    .Select(c => new MovieCopyDto
+                    {
+                        Id = c.Id,
+                        SerialNumber = c.SerialNumber,
+                        Description = c.Description
+                    }).ToList()
+            };
+
+            return Ok(movieDto);
         }
+
 
         //Zanrovi po filmu
         [HttpGet("{id:int}/genres")]
