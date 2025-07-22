@@ -35,7 +35,7 @@ namespace VideoLibrary.Controllers
                 .Where(mc => mc.MovieId == movieId)
                 .ToListAsync();
 
-            if (copies == null || !copies.Any())
+            if (!copies.Any())
                 return NotFound();
 
             return Ok(copies);
