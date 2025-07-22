@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using VideoLibrary.Dtos;
-using VideoLibrary.DTOs;
+using VideoLibrary.DataTransferObjects.Actor;
 using VideoLibrary.Models;
 
 namespace VideoLibrary.Controllers

@@ -1,4 +1,4 @@
-﻿namespace VideoLibrary.DTOs
+﻿namespace VideoLibrary.DataTransferObjects.MovieCopy
 {
     public class MovieCopyDto
     {

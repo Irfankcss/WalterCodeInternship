@@ -1,4 +1,4 @@
-﻿namespace VideoLibrary.DTOs
+﻿namespace VideoLibrary.DataTransferObjects.User
 {
     public class RegisterDto
     {

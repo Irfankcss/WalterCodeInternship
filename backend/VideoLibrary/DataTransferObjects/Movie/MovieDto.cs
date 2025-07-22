@@ -1,6 +1,7 @@
-﻿using VideoLibrary.Models;
+﻿using VideoLibrary.DataTransferObjects.MovieCopy;
+using VideoLibrary.Models;
 
-namespace VideoLibrary.DTOs
+namespace VideoLibrary.DataTransferObjects.Movie
 {
     public class MovieDto
     {
@@ -12,7 +13,7 @@ namespace VideoLibrary.DTOs
         public string? Poster { get; set; }
 
         public int DirectorId { get; set; }
-        public Director Director { get; set; }
+        public Models.Director Director { get; set; }
 
         public int EditedById { get; set; }
         public string EditedByUsername { get; set; }
