@@ -2,12 +2,13 @@
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const routes = router.options.routes
+const sidebarFilteredRoutes = ['Profile', 'Login', 'Register']
+const routes = router.options.routes.filter(route => !sidebarFilteredRoutes.includes(route.name))
 </script>
 
 <template>
   <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/dashboard">
       <div class="sidebar-brand-icon rotate-n-15">
         <i class="fas fa-video"></i>
       </div>
