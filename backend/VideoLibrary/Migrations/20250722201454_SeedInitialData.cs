@@ -65,11 +65,11 @@ namespace VideoLibrary.Migrations
                 columns: new[] { "Id", "Name", "Year", "ImdbId", "ImdbRating", "Poster", "DirectorId", "EditedById", "IsDeleted" },
                 values: new object[,]
                 {
-                    { 1, "Inception", 2010, "tt1375666", 8.8, "poster1.jpg", 1, 1, false },
-                    { 2, "Jurassic Park", 1993, "tt0107290", 8.1, "poster2.jpg", 2, 1, false },
-                    { 3, "Pulp Fiction", 1994, "tt0110912", 8.9, "poster3.jpg", 3, 1, false },
-                    { 4, "Interstellar", 2014, "tt0816692", 8.6, "poster4.jpg", 1, 2, false },
-                    { 5, "The Matrix", 1999, "tt0133093", 8.7, "poster5.jpg", 1, 2, false }
+                    { 1, "Inception", 2010, "tt1375666", 8.8, "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg", 1, 1, false },
+                    { 2, "Jurassic Park", 1993, "tt0107290", 8.1, "https://m.media-amazon.com/images/M/MV5BMjM2MDgxMDg0Nl5BMl5BanBnXkFtZTgwNTM2OTM5NDE@._V1_FMjpg_UX1000_.jpg", 2, 1, false },
+                    { 3, "Pulp Fiction", 1994, "tt0110912", 8.9, "https://m.media-amazon.com/images/M/MV5BYTViYTE3ZGQtNDBlMC00ZTAyLTkyODMtZGRiZDg0MjA2YThkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg", 3, 1, false },
+                    { 4, "Interstellar", 2014, "tt0816692", 8.6, "https://m.media-amazon.com/images/M/MV5BYzdjMDAxZGItMjI2My00ODA1LTlkNzItOWFjMDU5ZDJlYWY3XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg", 1, 2, false },
+                    { 5, "The Matrix", 1999, "tt0133093", 8.7, "https://m.media-amazon.com/images/M/MV5BN2NmN2VhMTQtMDNiOS00NDlhLTliMjgtODE2ZTY0ODQyNDRhXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg", 1, 2, false }
                 });
 
             // MovieCopies
