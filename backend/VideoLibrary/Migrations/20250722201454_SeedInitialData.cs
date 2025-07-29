@@ -99,44 +99,13 @@ namespace VideoLibrary.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData("Rentals", "Id", 1);
-            migrationBuilder.DeleteData("Rentals", "Id", 2);
-            migrationBuilder.DeleteData("Rentals", "Id", 3);
-
-            migrationBuilder.DeleteData("MovieCopies", "Id", 1);
-            migrationBuilder.DeleteData("MovieCopies", "Id", 2);
-            migrationBuilder.DeleteData("MovieCopies", "Id", 3);
-            migrationBuilder.DeleteData("MovieCopies", "Id", 4);
-            migrationBuilder.DeleteData("MovieCopies", "Id", 5);
-
-            migrationBuilder.DeleteData("Movies", "Id", 1);
-            migrationBuilder.DeleteData("Movies", "Id", 2);
-            migrationBuilder.DeleteData("Movies", "Id", 3);
-            migrationBuilder.DeleteData("Movies", "Id", 4);
-            migrationBuilder.DeleteData("Movies", "Id", 5);
-
-            migrationBuilder.DeleteData("Genres", "Id", 1);
-            migrationBuilder.DeleteData("Genres", "Id", 2);
-            migrationBuilder.DeleteData("Genres", "Id", 3);
-            migrationBuilder.DeleteData("Genres", "Id", 4);
-            migrationBuilder.DeleteData("Genres", "Id", 5);
-
-            migrationBuilder.DeleteData("Actors", "Id", 1);
-            migrationBuilder.DeleteData("Actors", "Id", 2);
-            migrationBuilder.DeleteData("Actors", "Id", 3);
-            migrationBuilder.DeleteData("Actors", "Id", 4);
-            migrationBuilder.DeleteData("Actors", "Id", 5);
-            migrationBuilder.DeleteData("Actors", "Id", 6);
-
-            migrationBuilder.DeleteData("Directors", "Id", 1);
-            migrationBuilder.DeleteData("Directors", "Id", 2);
-            migrationBuilder.DeleteData("Directors", "Id", 3);
-
-            migrationBuilder.DeleteData("Users", "Id", 1);
-            migrationBuilder.DeleteData("Users", "Id", 2);
-            migrationBuilder.DeleteData("Users", "Id", 3);
-            migrationBuilder.DeleteData("Users", "Id", 4);
-            migrationBuilder.DeleteData("Users", "Id", 5);
+            migrationBuilder.Sql("DELETE FROM Rentals");
+            migrationBuilder.Sql("DELETE FROM MovieCopies");
+            migrationBuilder.Sql("DELETE FROM Movies");
+            migrationBuilder.Sql("DELETE FROM Genres");
+            migrationBuilder.Sql("DELETE FROM Actors");
+            migrationBuilder.Sql("DELETE FROM Directors");
+            migrationBuilder.Sql("DELETE FROM Users");
         }
     }
 }
