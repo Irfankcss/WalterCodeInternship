@@ -140,7 +140,6 @@ namespace VideoLibrary.Controllers
                 {
                     MovieId = movie.Id,
                     ActorId = actorId,
-                    MovieDirectorId = dto.DirectorId,
                     MainActor = false
                 });
             }

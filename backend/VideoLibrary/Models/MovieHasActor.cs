@@ -6,8 +6,6 @@
         public Movie Movie { get; set; }
         public int ActorId { get; set; }
         public Actor Actor { get; set; }
-        public int MovieDirectorId { get; set; }
-        public Director Director { get; set; }
         public bool MainActor { get; set; }
     }
 }

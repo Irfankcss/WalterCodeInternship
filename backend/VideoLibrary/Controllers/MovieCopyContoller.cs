@@ -32,7 +32,7 @@ namespace VideoLibrary.Controllers
         public async Task<ActionResult<IEnumerable<MovieCopy>>> GetMovieCopiesByMovieId(int movieId)
         {
             var copies = await _context.MovieCopies
-                .Where(mc => mc.MovieId == movieId)
+                .Where(mc => mc.MovieId == movieId).Where(mc => !mc.IsDeleted)
                 .ToListAsync();
 
             if (!copies.Any())

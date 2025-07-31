@@ -21,13 +21,30 @@ namespace VideoLibrary.Controllers
         // Returns all rental records
         // Useful for displaying a history of all rentals
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Rental>>> GetAll()
+        public async Task<ActionResult<IEnumerable<RentalDto>>> GetAll()
         {
-            return await _context.Rentals
+            var rentals = await _context.Rentals
                 .Include(r => r.BorrowedBy)
                 .Include(r => r.BorrowedTo)
                 .Include(r => r.MovieCopy)
-                .Where(r=>!r.IsDeleted).ToListAsync();
+                    .ThenInclude(mc => mc.Movie)
+                .Where(r => !r.IsDeleted)
+                .Select(r => new RentalDto
+                {
+                    Id = r.Id,
+                    Date = r.Date,
+                    ReturnDate = r.ReturnDate,
+                    BorrowedById = r.BorrowedById,
+                    BorrowedByName = r.BorrowedBy.Name,
+                    BorrowedToId = r.BorrowedToId,
+                    BorrowedToName = r.BorrowedTo.Name,
+                    MovieCopyId = r.MovieCopyId,
+                    MovieId = r.MovieCopy.MovieId,
+                    MovieTitle = r.MovieCopy.Movie.Name
+                })
+                .ToListAsync();
+
+            return Ok(rentals);
         }
 
         // GET: api/rental/5
@@ -50,7 +67,6 @@ namespace VideoLibrary.Controllers
 
         // POST: api/rental
         // Creates a rental using only ID references for users and movie copy
-        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Rental>> Create([FromBody] RentalCreateDto dto)
         {
@@ -92,7 +108,6 @@ namespace VideoLibrary.Controllers
         // DELETE: api/rental/5
         // Deletes a rental record by ID.
         // Soft delete is implemented by marking the rental as deleted
-        [Authorize]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {

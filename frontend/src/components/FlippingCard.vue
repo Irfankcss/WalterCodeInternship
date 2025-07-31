@@ -5,9 +5,6 @@
         <div class="card front">
           <img :src="imageUrl" class="card-img-top img-fluid">
           <div class="card-block">
-            <h4 class="card-title">{{ title }}</h4>
-            <p class="card-text">{{ frontText }}</p>
-            <p class="card-text"><small class="text-muted">{{director}} ({{ publishedYear }})</small></p>
           </div>
         </div>
         <!-- End Card 2 Front -->
@@ -20,6 +17,7 @@
           </div>
           <div class="card-block">
             <h4 class="card-title">{{ title }}</h4>
+            <p class="card-text"><small class="text-muted">{{director}} ({{ publishedYear }})</small></p>
             <p class="card-text">{{ backText}}</p>
             <a :href="link" class="btn btn-primary" target="_blank">{{linkTitle}}</a>
           </div>
@@ -102,6 +100,10 @@ defineProps({
 
 .card-container:hover .card-flip {
   transform: rotateY(180deg);
+}
+img{
+  height: 100%;
+  width: 100%;
 }
 
 </style>

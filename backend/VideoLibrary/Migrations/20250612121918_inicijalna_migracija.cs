@@ -173,38 +173,31 @@ namespace VideoLibrary.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "MovieHasActors",
-                columns: table => new
-                {
-                    MovieId = table.Column<int>(type: "int", nullable: false),
-                    ActorId = table.Column<int>(type: "int", nullable: false),
-                    MovieDirectorId = table.Column<int>(type: "int", nullable: false),
-                    DirectorId = table.Column<int>(type: "int", nullable: false),
-                    MainActor = table.Column<bool>(type: "tinyint(1)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MovieHasActors", x => new { x.MovieId, x.ActorId, x.MovieDirectorId });
-                    table.ForeignKey(
-                        name: "FK_MovieHasActors_Actors_ActorId",
-                        column: x => x.ActorId,
-                        principalTable: "Actors",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_MovieHasActors_Directors_DirectorId",
-                        column: x => x.DirectorId,
-                        principalTable: "Directors",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_MovieHasActors_Movies_MovieId",
-                        column: x => x.MovieId,
-                        principalTable: "Movies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+    name: "MovieHasActors",
+    columns: table => new
+    {
+        MovieId = table.Column<int>(type: "int", nullable: false),
+        ActorId = table.Column<int>(type: "int", nullable: false),
+        MainActor = table.Column<bool>(type: "tinyint(1)", nullable: false)
+    },
+    constraints: table =>
+    {
+        table.PrimaryKey("PK_MovieHasActors", x => new { x.MovieId, x.ActorId });
+        table.ForeignKey(
+            name: "FK_MovieHasActors_Actors_ActorId",
+            column: x => x.ActorId,
+            principalTable: "Actors",
+            principalColumn: "Id",
+            onDelete: ReferentialAction.Cascade);
+        table.ForeignKey(
+            name: "FK_MovieHasActors_Movies_MovieId",
+            column: x => x.MovieId,
+            principalTable: "Movies",
+            principalColumn: "Id",
+            onDelete: ReferentialAction.Cascade);
+    })
+    .Annotation("MySql:CharSet", "utf8mb4");
+
 
             migrationBuilder.CreateTable(
                 name: "MovieRatings",
@@ -285,10 +278,6 @@ namespace VideoLibrary.Migrations
                 table: "MovieHasActors",
                 column: "ActorId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_MovieHasActors_DirectorId",
-                table: "MovieHasActors",
-                column: "DirectorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MovieRatings_UserId",

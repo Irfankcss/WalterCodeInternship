@@ -15,7 +15,7 @@ namespace VideoLibrary
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<MovieHasActor>()
-                .HasKey(ma => new { ma.MovieId, ma.ActorId, ma.MovieDirectorId });
+                .HasKey(ma => new { ma.MovieId, ma.ActorId});
 
             modelBuilder.Entity<GenreHasMovie>()
                 .HasKey(gm => new { gm.GenreId, gm.MovieId });

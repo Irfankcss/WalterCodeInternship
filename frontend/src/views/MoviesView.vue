@@ -3,14 +3,14 @@
   <div class="container">
     <div class="row">
       <FlippingCard
-        v-for="movie in movies"
-        :key="movie.imdbID"
-        :imageUrl="movie.imageUrl"
-        :title="movie.title"
-        :director="movie.director"
-        :publishedYear="movie.publishedYear"
+        v-for="movie in filmovi"
+        :key="movie.id"
+        :imageUrl="movie.poster"
+        :title="movie.name"
+        :director="movie.director.name"
+        :publishedYear="movie.year"
         :imdbRating="movie.imdbRating"
-        :frontText="movie.frontText"
+        :frontText="movie.desc"
         :backText="movie.backText"
         :link="movie.link"
         :linkTitle="movie.linkTitle"
@@ -21,7 +21,13 @@
 
 <script setup>
 import FlippingCard from '../components/FlippingCard.vue'
-
+import {onMounted, ref} from "vue";
+const filmovi = ref([])
+onMounted(() => {
+  fetch('http://localhost:5222/api/Movie')
+    .then(response => response.json())
+    .then(data => filmovi.value = data)
+})
 const movies = [
   {
     imdbID: 'tt0111161',

@@ -15,9 +15,14 @@ const router = createRouter({
       component: () => import('../views/MoviesView.vue'),
     },
     {
-      path: '/table',
-      name: 'Table',
-      component: () => import('../views/TableView.vue'),
+      path: '/admin-panel',
+      name: 'Admin Panel',
+      component: () => import('../views/AdminPanelView.vue'),
+    },
+    {
+      path: '/movies/:id/copies',
+      name: 'Movie Copies',
+      component: () => import('../components/admin-moviecopies/MovieCopiesManager.vue'),
     }
   ],
 })
