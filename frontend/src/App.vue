@@ -2,25 +2,28 @@
 import Sidebar from './components/Sidebar.vue'
 import Topbar from './components/Topbar.vue'
 import Footer from './components/Footer.vue'
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
 import Toast from "@/components/Toast.vue";
+const route = useRoute()
 </script>
 
 <template>
-    <div id="wrapper" class="d-flex">
-
-      <Sidebar />
-      <div id="content-wrapper" class="d-flex flex-column w-100">
-        <div id="content">
-          <Topbar />
-          <div class="container-fluid">
-            <Toast />
-            <RouterView />
-          </div>
+  <div v-if="route.name === 'Login' || route.name === 'Register' || route.name === 'ForgotPassword'">
+    <RouterView />
+  </div>
+  <div v-else id="wrapper" class="d-flex">
+    <Sidebar />
+    <div id="content-wrapper" class="d-flex flex-column w-100">
+      <div id="content">
+        <Topbar />
+        <div class="container-fluid">
+          <Toast />
+          <RouterView />
         </div>
-        <Footer />
       </div>
+      <Footer />
     </div>
+  </div>
 </template>
 
 <style scoped>

@@ -2,7 +2,7 @@
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const sidebarFilteredRoutes = ['Profile', 'Login', 'Register', 'Movie Copies']
+const sidebarFilteredRoutes = ['Profile', 'Login', 'Register', 'Movie Copies', 'ForgotPassword']
 const routes = router.options.routes.filter(route => !sidebarFilteredRoutes.includes(route.name))
 </script>
 

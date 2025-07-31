@@ -23,6 +23,21 @@ const router = createRouter({
       path: '/movies/:id/copies',
       name: 'Movie Copies',
       component: () => import('../components/admin-moviecopies/MovieCopiesManager.vue'),
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: () => import('../views/Login/LoginView.vue'),
+    },
+    {
+      path: '/register',
+      name: 'Register',
+      component: () => import('../views/Login/RegisterView.vue'),
+    },
+    {
+      path: '/forgot-password',
+      name: 'ForgotPassword',
+      component: () => import('../views/Login/ForgotPasswordView.vue'),
     }
   ],
 })
