@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VideoLibrary.DataTransferObjects.Rental;
+using VideoLibrary.DTOs;
 using VideoLibrary.Models;
 
 namespace VideoLibrary.Controllers

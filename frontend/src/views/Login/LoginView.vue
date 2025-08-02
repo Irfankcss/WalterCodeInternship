@@ -18,11 +18,13 @@
                                     </div>
                                     <form class="user" @submit.prevent="handleLogin">
                                         <div class="form-group">
-                                            <input type="email" class="form-control form-control-user"
-                                                id="exampleInputEmail" aria-describedby="emailHelp"
-                                                placeholder="Enter Email Address..."
-                                                v-model="email">
-                                            <div v-if="emailError" class="text-danger small mt-1">{{ emailError }}</div>
+                                            <input type="text" class="form-control form-control-user"
+                                                id="exampleInputUsername" aria-describedby="usernameHelp"
+                                                placeholder="Enter Username..."
+                                                v-model="username">
+                                            <div v-if="usernameError" class="text-danger small mt-1">{{
+                                                usernameError
+                                              }}</div>
                                         </div>
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-user"
@@ -40,18 +42,10 @@
                                         <button type="submit" class="btn btn-primary btn-user btn-block">
                                             Login
                                         </button>
-                                        <hr>
-                                        <router-link to="/login-google" class="btn btn-google btn-user btn-block">
-                                            <i class="fab fa-google fa-fw"></i> Login with Google
-                                        </router-link>
-                                        <router-link to="/login-facebook" class="btn btn-facebook btn-user btn-block">
-                                            <i class="fab fa-facebook-f fa-fw"></i> Login with Facebook
-                                        </router-link>
+
                                     </form>
                                     <hr>
-                                    <div class="text-center">
-                                        <router-link class="small" to="/forgot-password">Forgot Password?</router-link>
-                                    </div>
+
                                     <div class="text-center">
                                         <router-link class="small" to="/register">Create an Account!</router-link>
                                     </div>
@@ -69,41 +63,66 @@
 </template>
 
 <script>
+import emitter from "@/utils/emitter.js";
 export default {
     data() {
         return {
-            email: '',
+            username: '',
             password: '',
             rememberMe: false,
-            emailError: '',
+            usernameError: '',
             passwordError: ''
         };
     },
     methods: {
         handleLogin() {
-            this.emailError = '';
+            this.usernameError = '';
             this.passwordError = '';
             let valid = true;
 
-            // Basic email validation
-            if (!this.email) {
-                this.emailError = 'Email is required.';
-                valid = false;
-            } else if (!/\S+@\S+\.\S+/.test(this.email)) {
-                this.emailError = 'Email is invalid.';
+            if (!this.username) {
+                this.usernameError = 'Username is required.';
                 valid = false;
             }
 
-            // Basic password validation
             if (!this.password) {
                 this.passwordError = 'Password is required.';
                 valid = false;
             }
 
-            if (valid) {
-                // Proceed with login logic, e.g., API call or navigation
-                this.$router.push('/dashboard');
-            }
+          if (valid) {
+            fetch("http://localhost:5222/api/User/login", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                username: this.username,
+                password: this.password,
+              }),
+            })
+              .then(async (response) => {
+                const data = await response.json();
+                if (!response.ok) {
+                  throw new Error(data.message || "Invalid credentials");
+                } else if(response.status === 200){
+                  localStorage.setItem("token", data.token);
+                  emitter.emit("userLoggedIn");
+                  emitter.emit("toast", {
+                    message: "Welcome back!",
+                    type: "success",
+                  })
+                  this.$router.push("/movies");
+                }
+              })
+              .catch((error) => {
+                console.log("Toast emit:", error.message);
+                emitter.emit("toast", {
+                  message: "Invalid login credentials",
+                  type: "error",
+                });
+              });
+          }
         }
     }
 }

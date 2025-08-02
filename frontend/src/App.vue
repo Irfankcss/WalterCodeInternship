@@ -8,6 +8,7 @@ const route = useRoute()
 </script>
 
 <template>
+  <Toast />
   <div v-if="route.name === 'Login' || route.name === 'Register' || route.name === 'ForgotPassword'">
     <RouterView />
   </div>
@@ -17,7 +18,7 @@ const route = useRoute()
       <div id="content">
         <Topbar />
         <div class="container-fluid">
-          <Toast />
+
           <RouterView />
         </div>
       </div>

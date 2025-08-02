@@ -141,7 +141,7 @@ namespace VideoLibrary.Controllers
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Name, user.Name),
             new Claim("UserId", user.Id.ToString()),
             new Claim(ClaimTypes.Role, user.Admin ? "Admin" : "User")
                 }),
