@@ -1,34 +1,38 @@
 <template>
-<div class="col-md-3 card-container">
-      <div class="card-flip">
-        <!-- Card 2 Front -->
-        <div class="card front">
-          <img :src="imageUrl" class="card-img-top img-fluid">
-          <div class="card-block">
-          </div>
+  <div class="col-md-3 card-container">
+    <div class="card-flip">
+      <!-- Card 2 Front -->
+      <div class="card front">
+        <img :src="imageUrl" class="card-img-top img-fluid">
+        <div class="card-block">
         </div>
-        <!-- End Card 2 Front -->
+      </div>
 
-        <!-- Card 2 Back -->
-        <div class="card back">
-          <div class="card-header">
-            <i class="fas fa-star"></i>
-            {{ imdbRating }}
-          </div>
-          <div class="card-block">
-            <h4 class="card-title">{{ title }}</h4>
-            <p class="card-text"><small class="text-muted">{{director}} ({{ publishedYear }})</small></p>
-            <p class="card-text">{{ backText}}</p>
-            <a :href="link" class="btn btn-primary" target="_blank">{{linkTitle}}</a>
-          </div>
+      <!-- Card 2 Back -->
+      <div class="card back">
+        <div class="card-header">
+          <i class="fas fa-star"></i>
+          {{ imdbRating }}
         </div>
-        <!-- End Card 2 Back -->
+        <div class="card-block">
+          <h4 class="card-title">{{ title }}</h4>
+          <p class="card-text"><small class="text-muted">{{ director }} ({{ publishedYear }})</small></p>
+          <p class="card-text">{{ backText }}</p>
+          <router-link :to="{ name: 'MovieDetails', params: { imdbID: movieId } }" class="btn btn-primary">
+            Details
+          </router-link>
+        </div>
       </div>
     </div>
+  </div>
 </template>
 
 <script setup>
 defineProps({
+  movieId: {
+    type: String,
+    required: true
+  },
   imageUrl: {
     type: String,
     required: true
@@ -51,14 +55,6 @@ defineProps({
   backText: {
     type: String,
     default: 'No description available.'
-  },
-  link: {
-    type: String,
-    default: '#'
-  },
-  linkTitle: {
-    type: String,
-    default: 'View More'
   }
 })
 </script>
@@ -106,4 +102,7 @@ img{
   width: 100%;
 }
 
+.btn {
+  margin-top: 10px;
+}
 </style>

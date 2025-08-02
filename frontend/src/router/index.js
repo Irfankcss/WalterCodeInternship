@@ -1,11 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Dashboard from '../views/Dashboard.vue';
-import isAdmin from "@/utils/auth.js";
-
+import Dashboard from '../views/Dashboard.vue'
+import isAdmin from "@/utils/auth.js"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/',
+      redirect: '/dashboard'
+    },
     {
       path: '/dashboard',
       name: 'Dashboard',
@@ -16,6 +19,7 @@ const router = createRouter({
       path: '/movies',
       name: 'Movies',
       component: () => import('../views/MoviesView.vue'),
+      meta: { title: 'Filmovi' }
     },
     {
       path: '/admin-panel',
@@ -43,15 +47,32 @@ const router = createRouter({
       path: '/forgot-password',
       name: 'ForgotPassword',
       component: () => import('../views/Login/ForgotPasswordView.vue'),
+    },
+    {
+      path: '/movie/:imdbID',
+      name: 'MovieDetails',
+      component: () => import('../views/MovieDetails.vue'),
+      meta: { title: 'Detalji filma' },
+    },
+    {
+      path: '/profile',
+      name: 'UserProfile',
+      component: () => import('../views/UserProfile.vue'),
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/dashboard'
     }
-  ],
+  ]
 })
 
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAdmin && !isAdmin()) {
-    return next('/movies');
+    return next('/movies')
   }
-  next();
-});
+
+  document.title = to.meta.title || 'Video Klub'
+  next()
+})
 
 export default router

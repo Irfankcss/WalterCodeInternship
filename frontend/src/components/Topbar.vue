@@ -19,7 +19,7 @@
 
     <!-- Topbar Navbar -->
     <ul class="navbar-nav ml-auto">
-      <!-- Nav Item - Alerts -->
+      <!-- Alerts -->
       <li class="nav-item dropdown no-arrow mx-1">
         <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <i class="fas fa-bell fa-fw"></i>
@@ -41,7 +41,6 @@
           <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
         </div>
       </li>
-
       <!-- Nav Item - User Information -->
       <li v-if="!isLoggedin" class="nav-item d-flex align-items-center justify-content-center gap-2">
         <button class="btn btn-primary me-2" type="button" @click="$router.push('/login')">Login</button>
@@ -54,12 +53,12 @@
           <img class="img-profile rounded-circle" src="../../static/sbadmin/img/undraw_profile.svg">
         </a>
         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-          <a class="dropdown-item" href="#">
+          <router-link class="dropdown-item" to="/profile">
             <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
             Profile
-          </a>
-          <a class="dropdown-item" href="#" data-toggle="modal" v-on:click="logout()" data-target="#logoutModal">
-            <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+          </router-link>
+          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                      <a class="dropdown-item" href="#" data-toggle="modal" v-on:click="logout()" data-target="#logoutModal"></a>
             Logout
           </a>
         </div>
@@ -97,9 +96,12 @@ const logout = () => {
   window.location.reload()
 }
 const isLoggedin = ref(false)
-
 </script>
 
 <style scoped>
-/* Add any specific styles for the Topbar component here */
+.img-profile {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}
 </style>
