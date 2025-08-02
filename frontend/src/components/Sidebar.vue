@@ -1,14 +1,25 @@
 <script setup>
 import { useRouter } from 'vue-router'
+import isAdmin from '@/utils/auth'
 
 const router = useRouter()
 const sidebarFilteredRoutes = ['Profile', 'Login', 'Register', 'Movie Copies', 'ForgotPassword']
-const routes = router.options.routes.filter(route => !sidebarFilteredRoutes.includes(route.name))
+
+const routes = router.options.routes.filter(route => {
+  if (sidebarFilteredRoutes.includes(route.name))
+    return false;
+  if (route.meta?.requiresAdmin && !isAdmin())
+    return false;
+
+  return true;
+})
 </script>
 
 <template>
-  <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/dashboard">
+  <ul class="navbar-nav sidebar sidebar-dark accordion"
+      :style="{ backgroundColor: isAdmin() ? '#0a1c21' : '#4d72dd' }"
+      id="accordionSidebar">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/movies">
       <div class="sidebar-brand-icon rotate-n-15">
         <i class="fas fa-video"></i>
       </div>

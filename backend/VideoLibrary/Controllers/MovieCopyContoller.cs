@@ -43,7 +43,7 @@ namespace VideoLibrary.Controllers
 
         // POST: api/moviecopy
         // Adds a new movie copy using only MovieId, not entire Movie object
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<MovieCopy>> Create([FromBody] MovieCopyCreateDto dto)
         {
@@ -63,7 +63,7 @@ namespace VideoLibrary.Controllers
         // PUT: api/moviecopy/5
         // Updates an existing movie copy with new information
         // Used when modifying the copy's serial number or description
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] MovieCopy updatedCopy)
         {
@@ -83,7 +83,7 @@ namespace VideoLibrary.Controllers
         // DELETE: api/moviecopy/5
         // Deletes a movie copy by ID.
         // Soft delete is implemented by marking the movie copy as deleted
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {

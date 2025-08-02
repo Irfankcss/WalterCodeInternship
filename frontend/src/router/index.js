@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Dashboard from '../views/Dashboard.vue';
+import isAdmin from "@/utils/auth.js";
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -7,6 +9,7 @@ const router = createRouter({
     {
       path: '/dashboard',
       name: 'Dashboard',
+      meta: { requiresAdmin: true },
       component: Dashboard
     },
     {
@@ -17,11 +20,13 @@ const router = createRouter({
     {
       path: '/admin-panel',
       name: 'Admin Panel',
+      meta: { requiresAdmin: true },
       component: () => import('../views/AdminPanelView.vue'),
     },
     {
       path: '/movies/:id/copies',
       name: 'Movie Copies',
+      meta: { requiresAdmin: true },
       component: () => import('../components/admin-moviecopies/MovieCopiesManager.vue'),
     },
     {
@@ -41,5 +46,12 @@ const router = createRouter({
     }
   ],
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAdmin && !isAdmin()) {
+    return next('/movies');
+  }
+  next();
+});
 
 export default router

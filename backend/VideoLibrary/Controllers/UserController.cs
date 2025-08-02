@@ -29,6 +29,7 @@ namespace VideoLibrary.Controllers
         // GET: api/user
         // Returns a list of all users
         // Can be used by admin to manage users
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
         {
@@ -76,7 +77,7 @@ namespace VideoLibrary.Controllers
         // POST: api/user
         // Creates a new user
         // Could be used for registration (without auth for now)
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<User>> Create([FromBody] User user)
         {
@@ -89,7 +90,7 @@ namespace VideoLibrary.Controllers
         // PUT: api/user/5
         // Updates an existing user's data
         // Can be used by admin or for profile editing
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] UserUpdateDto dto)
         {

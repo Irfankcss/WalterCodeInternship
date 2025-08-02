@@ -56,7 +56,7 @@ namespace VideoLibrary.Controllers
         // POST: api/genre
         // This adds a new genre to the database
         // It's used when we submit a form to create a new genre
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Genre>> CreateGenre([FromBody] Genre genre)
         {
@@ -68,7 +68,7 @@ namespace VideoLibrary.Controllers
         // PUT: api/genre/5
         // This updates a genre with the given ID
         // Used when we want to change the name or description of a genre
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateGenre(int id, [FromBody] GenreUpdateDto dto)
         {
@@ -88,7 +88,7 @@ namespace VideoLibrary.Controllers
         // DELETE: api/genre/5
         // Deletes a genre by ID.
         // Soft delete is implemented by marking the genre as deleted
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
