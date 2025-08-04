@@ -1,29 +1,36 @@
 <template>
   <div class="container-fluid">
-    <!-- Filter Section -->
+    <!-- Filter & Sorting Section -->
     <div class="row mb-4">
-      <div class="col-md-6">
-        <div class="input-group">
-          <select v-model="selectedGenre" class="form-control bg-light border-0 small">
-            <option value="">Svi žanrovi</option>
-            <option v-for="genre in staticGenres" :value="genre">
-              {{ genre }}
-            </option>
-          </select>
-        </div>
+      <div class="col-md-4">
+        <select v-model="selectedGenre" class="form-control bg-light border-0 small">
+          <option value="">All genres</option>
+          <option v-for="genre in staticGenres" :key="genre" :value="genre">{{ genre }}</option>
+        </select>
       </div>
-      <div class="col-md-6">
-        <input 
-          v-model="searchQuery"
-          type="text" 
-          class="form-control bg-light border-0 small" 
-          placeholder="Pretraži filmove..."
-        >
+
+      <div class="col-md-4">
+        <input v-model="searchQuery" type="text" class="form-control bg-light border-0 small"
+          placeholder="Search movies...">
+      </div>
+
+      <div class="col-md-4">
+        <select v-model="sortOption" class="form-control bg-light border-0 small">
+          <option value="">No sorting</option>
+          <option value="title-asc">Title A–Z</option>
+          <option value="title-desc">Title Z–A</option>
+          <option value="rating-asc">Rating 1–10</option>
+          <option value="rating-desc">Rating 10–1</option>
+          <option value="director-asc">Director A–Z</option>
+          <option value="director-desc">Director Z–A</option>
+          <option value="publishedYear-asc">Year Ascending</option>
+          <option value="publishedYear-desc">Year Descending</option>
+        </select>
       </div>
     </div>
 
     <!-- Movie Cards Grid -->
-    <div class="row">
+    <div class="row">D
       <FlippingCard
         v-for="movie in filmovi"
         :key="movie.id"
@@ -41,6 +48,7 @@
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, computed } from 'vue'
@@ -121,24 +129,44 @@ const movies = [
 ]
 
 const staticGenres = ['Drama', 'Crime', 'Action', 'History', 'Sci-Fi']
-
-// Stanje
 const selectedGenre = ref('')
 const searchQuery = ref('')
+const sortOption = ref('')
 
-// Filtrirani filmovi
 const filteredMovies = computed(() => {
   return movies.filter(movie => {
-    const genreMatch = !selectedGenre.value || 
-      movie.genre.toLowerCase() === selectedGenre.value.toLowerCase()
-    
-    const searchMatch = !searchQuery.value ||
-      movie.title.toLowerCase().includes(searchQuery.value.toLowerCase())
-    
+    const genreMatch = !selectedGenre.value || movie.genre.toLowerCase() === selectedGenre.value.toLowerCase()
+    const searchMatch = !searchQuery.value || movie.title.toLowerCase().includes(searchQuery.value.toLowerCase())
     return genreMatch && searchMatch
   })
 })
+
+const sortedMovies = computed(() => {
+  const result = [...filteredMovies.value]
+
+  switch (sortOption.value) {
+    case 'title-asc':
+      return result.sort((a, b) => a.title.localeCompare(b.title))
+    case 'title-desc':
+      return result.sort((a, b) => b.title.localeCompare(a.title))
+    case 'rating-asc':
+      return result.sort((a, b) => a.imdbRating - b.imdbRating)
+    case 'rating-desc':
+      return result.sort((a, b) => b.imdbRating - a.imdbRating)
+    case 'director-asc':
+      return result.sort((a, b) => a.director.localeCompare(b.director))
+    case 'director-desc':
+      return result.sort((a, b) => b.director.localeCompare(a.director))
+    case 'publishedYear-asc': 
+      return result.sort((a, b) => a.publishedYear - b.publishedYear)
+    case 'publishedYear-desc':
+      return result.sort((a, b) => b.publishedYear - a.publishedYear)
+    default:
+      return result
+  }
+})
 </script>
+
 
 <style scoped>
 .container {
@@ -149,4 +177,5 @@ const filteredMovies = computed(() => {
   flex-wrap: wrap;
   justify-content: center;
 }
+</style>
 

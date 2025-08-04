@@ -9,8 +9,9 @@ export const useUserStore = defineStore('user', () => {
     email: "pera@example.com",
     dob: "1990-05-15",
     password: "123456",
-    avatarUrl: "/avatars/avatar.jpg", 
-    favoriteMovies: []
+    avatarUrl: "/avatars/avatar.jpg",
+    favoriteMovies: [],
+    rentals: []
   });
 
   const toggleFavorite = (movieId) => {

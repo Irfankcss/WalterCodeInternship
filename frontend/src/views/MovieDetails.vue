@@ -12,7 +12,7 @@
 
             <div class="movie-meta">
               <div class="meta-item">
-                <span class="meta-label">IMDb ocena:</span>
+                <span class="meta-label">IMDb rating:</span>
                 <span class="meta-value">{{ movie.imdbRating }}/10</span>
               </div>
               <div class="meta-item">
@@ -29,13 +29,13 @@
 
             <div class="action-buttons mb-3">
               <button class="btn btn-rent" @click="toggleShowCopies">
-                {{ showCopies ? 'Otkaži' : 'Iznajmi film' }}
+                {{ showCopies ? 'Cancel' : 'Rent movie' }}
               </button>
               <button class="btn btn-favorite" :class="{ active: isFavorite }" @click="toggleFavorite">
-                {{ isFavorite ? '★ Ukloni iz omiljenih' : '☆ Dodaj u omiljene' }}
+                {{ isFavorite ? '★ Remove from favorites' : '☆ Add to favorites' }}
               </button>
               <router-link to="/movies" class="btn btn-back">
-                Nazad na listu filmova
+                Back to movie list
               </router-link>
             </div>
           </div>
@@ -43,14 +43,13 @@
       </div>
     </div>
 
-    <!-- BLOK ZA IZNAJMLJIVANJE KOPIJA (premješten ovdje) -->
     <div v-if="showCopies && copies.length" class="container mt-4">
-      <h5>Odaberite kopiju i datum vraćanja (maksimalno 14 dana):</h5>
+      <h5>Choose a copy and return date (maksimalno 14 dana):</h5>
 
       <div class="d-flex flex-wrap gap-3">
         <div v-for="copy in copies" :key="copy.id" class="card"
-          :class="{ 'border-primary': selectedCopyId === copy.id }"
-          style="width: 18rem; cursor: pointer;" @click="selectedCopyId = copy.id">
+          :class="{ 'border-primary': selectedCopyId === copy.id }" style="width: 18rem; cursor: pointer;"
+          @click="selectedCopyId = copy.id">
           <div class="card-body">
             <h5 class="card-title">Serial Number: {{ copy.serialNumber }}</h5>
             <p class="card-text">{{ copy.description || 'No description.' }}</p>
@@ -59,66 +58,64 @@
       </div>
 
       <div class="mt-3">
-        <label>Datum vraćanja:</label>
+        <label>Return date:</label>
         <input type="date" v-model="returnDate" :min="today" :max="maxReturnDate"
           class="form-control w-auto d-inline-block ms-2">
-        <button class="btn btn-success ms-3" @click="confirmRent"
-          :disabled="!selectedCopyId || !returnDate">
-          Potvrdi iznajmljivanje
+        <button class="btn btn-success ms-3" @click="confirmRent" :disabled="!selectedCopyId || !returnDate">
+          Confirm rental
         </button>
       </div>
     </div>
-    <!-- KRAJ BLOKA ZA KOPIJE -->
 
     <div class="movie-content container">
       <div class="row">
         <div class="col-md-8">
           <section class="movie-section">
-            <h2 class="section-title">Opis</h2>
+            <h2 class="section-title">Description</h2>
             <p>{{ movie.frontText }}</p>
           </section>
 
           <section class="movie-section">
-            <h2 class="section-title">Glumci</h2>
+            <h2 class="section-title">Cast</h2>
             <div class="cast-grid">
-              <div class="cast-member" v-for="actor in mainCast" :key="actor">
-                <div class="actor-avatar"></div>
-                <span class="actor-name">{{ actor }}</span>
+              <div class="cast-member" v-for="actor in mainCast" :key="actor.name">
+                <img :src="actor.image" :alt="actor.name" class="actor-avatar" />
+                <span class="actor-name">{{ actor.name }}</span>
               </div>
             </div>
           </section>
 
           <section class="movie-section">
-            <h2 class="section-title">Komentari i ocjene</h2>
+            <h2 class="section-title">Comments and Ratings</h2>
             <div class="mb-3">
               <textarea v-model="newReview.comment" class="form-control mb-2"
-                placeholder="Napišite komentar..."></textarea>
+                placeholder="Write a comment..."></textarea>
               <select v-model.number="newReview.rating" class="form-control mb-2">
-                <option disabled value="">Ocijeni (1-5)</option>
+                <option disabled value="">Rate (1-5)</option>
                 <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
               </select>
-              <button class="btn btn-success" @click="submitReview">Dodaj recenziju</button>
+              <button class="btn btn-success" @click="submitReview">Add review</button>
             </div>
 
             <div v-if="movie.reviews.length">
               <div v-for="(review, index) in movie.reviews" :key="index" class="mb-3 border p-3 rounded">
-                <p class="mb-1"><strong>Ocjena:</strong> {{ review.rating }}/5</p>
+                <p class="mb-1"><strong>Rating:</strong> {{ review.rating }}/5</p>
                 <p class="mb-0"><em>{{ review.comment }}</em></p>
               </div>
             </div>
-            <div v-else class="text-muted">Još nema komentara za ovaj film.</div>
+            <div v-else class="text-muted">No comments yet for this movie.</div>
           </section>
         </div>
 
         <div class="col-md-4">
           <section class="movie-section">
-            <h2 class="section-title">Ocene</h2>
+            <h2 class="section-title">Ratings</h2>
             <div class="rating-box">
               <div class="rating-value">{{ movie.imdbRating }}</div>
               <div class="rating-stars">
                 <span class="star" v-for="n in 5" :key="n">★</span>
               </div>
-              <p class="rating-source">IMDb ocena</p>
+              <p class="rating-source">IMDb rating</p>
             </div>
           </section>
         </div>
@@ -127,7 +124,7 @@
   </div>
 
   <div v-else class="container mt-4">
-    <div class="alert alert-warning">Film nije pronađen</div>
+    <div class="alert alert-warning">Movie not found</div>
   </div>
 </template>
 
@@ -144,21 +141,10 @@ const imdbID = route.params.imdbID;
 const movie = ref(null);
 const newReview = ref({ comment: '', rating: '' });
 
-// DODANO: seed podaci za kopije
-const allMovieCopies = [
-  { id: 1, imdbID: 'tt0111161', serialNumber: "SN001", description: "Blu-ray copy" },
-  { id: 2, imdbID: 'tt0111161', serialNumber: "SN002", description: "DVD copy" },
-  { id: 3, imdbID: 'tt0068646', serialNumber: "SN003", description: "Collector's edition" },
-  { id: 4, imdbID: 'tt0468569', serialNumber: "SN004", description: "4K UHD" },
-  { id: 5, imdbID: 'tt0108052', serialNumber: "SN005", description: "Digital release" }
-];
-
-const selectedCopyId = ref(null)
-const returnDate = ref(null)
-
-const today = new Date().toISOString().split('T')[0]
-const maxReturnDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-
+const selectedCopyId = ref(null);
+const returnDate = ref(null);
+const today = new Date().toISOString().split('T')[0];
+const maxReturnDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
 const copies = ref([]);
 const showCopies = ref(false);
@@ -168,12 +154,40 @@ const toggleShowCopies = () => {
   returnDate.value = null;
 };
 
+const activeRentals = computed(() => {
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
+  return userStore.user.rentals?.filter(r => {
+    const rentedDate = new Date(r.rentedUntil);
+    rentedDate.setHours(0, 0, 0, 0);
+    return rentedDate >= todayDate;
+  }) || [];
+});
+
 const confirmRent = () => {
-  const copy = copies.value.find(c => c.id === selectedCopyId.value)
+  const copy = copies.value.find(c => c.id === selectedCopyId.value);
   if (copy && returnDate.value) {
-    alert(`DEMO: Izabrana kopija '${copy.serialNumber}' iznajmljena do ${returnDate.value}`)
+    if (activeRentals.value.length >= 3) {
+      alert("⚠️ You can't rent more than 3 movies at the same time.");
+      return;
+    }
+
+    const newRental = {
+      title: movie.value.title,
+      serialNumber: copy.serialNumber,
+      rentedUntil: returnDate.value
+    };
+
+    userStore.user.rentals.push(newRental);
+    localStorage.setItem('rentals', JSON.stringify(userStore.user.rentals));
+    window.dispatchEvent(new Event('storage'));
+    alert(`✅ Rental confirmed for '${copy.serialNumber}' until ${returnDate.value}`);
+
+    showCopies.value = false;
+    selectedCopyId.value = null;
+    returnDate.value = null;
   }
-}
+};
 
 const savedFavorites = localStorage.getItem('favorites');
 if (savedFavorites) {
@@ -191,6 +205,13 @@ const toggleFavorite = () => {
   }
 };
 
+const allMovieCopies = [
+  { id: 1, imdbID: 'tt0111161', serialNumber: "SN001", description: "Blu-ray copy" },
+  { id: 2, imdbID: 'tt0111161', serialNumber: "SN002", description: "DVD copy" },
+  { id: 3, imdbID: 'tt0068646', serialNumber: "SN003", description: "Collector's edition" },
+  { id: 4, imdbID: 'tt0468569', serialNumber: "SN004", description: "4K UHD" },
+  { id: 5, imdbID: 'tt0108052', serialNumber: "SN005", description: "Digital release" }
+];
 const allMovies = [
   {
     id: 1,
@@ -260,17 +281,16 @@ const allMovies = [
 ];
 
 const mainCast = ref([
-  'Tim Robbins',
-  'Morgan Freeman',
-  'Bob Gunton',
-  'William Sadler',
-  'Clancy Brown'
+  { name: 'Tim Robbins', image: 'https://ntvb.tmsimg.com/assets/assets/680595_v9_bc.jpg' },
+  { name: 'Morgan Freeman', image: 'https://m.media-amazon.com/images/M/MV5BMTc0MDMyMzI2OF5BMl5BanBnXkFtZTcwMzM2OTk1MQ@@._V1_FMjpg_UX1000_.jpg' },
+  { name: 'Bob Gunton', image: 'data:image/jpeg;base64,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' },
+  { name: 'William Sadler', image: 'https://images.entertainment.ie/person/rWeb2kjYCA7V9MC9kRwRpm57YoY.jpg' },
+  { name: 'Clancy Brown', image: 'https://m.media-amazon.com/images/M/MV5BMTUxODY3NjAzMF5BMl5BanBnXkFtZTcwMTQ5MjYwNg@@._V1_FMjpg_UX1000_.jpg' }
 ]);
 
-// Dodavanje komentara/ocene i snimanje u localStorage
 const submitReview = () => {
   if (!newReview.value.comment || !newReview.value.rating) {
-    alert('Molimo unesite komentar i ocjenu.');
+    alert('Please enter a comment and rating.');
     return;
   }
 
@@ -280,7 +300,6 @@ const submitReview = () => {
   });
 
   localStorage.setItem(`reviews_${movie.value.imdbID}`, JSON.stringify(movie.value.reviews));
-
   newReview.value.comment = '';
   newReview.value.rating = '';
 };
@@ -293,17 +312,14 @@ const handleRent = () => {
 
 onMounted(() => {
   movie.value = allMovies.find(m => m.imdbID === imdbID);
-
   if (movie.value) {
     copies.value = allMovieCopies.filter(c => c.imdbID === movie.value.imdbID);
   }
-
   const storedReviews = localStorage.getItem(`reviews_${imdbID}`);
   if (storedReviews && movie.value) {
     movie.value.reviews = JSON.parse(storedReviews);
   }
 });
-
 </script>
 <style scoped>
 .movie-details-container {
@@ -449,9 +465,11 @@ onMounted(() => {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background-color: #ddd;
+  object-fit: cover;
   margin-bottom: 0.5rem;
 }
+
+
 
 .actor-name {
   text-align: center;
