@@ -1,6 +1,5 @@
 <template>
   <div class="container-fluid">
-    <!-- Filter & Sorting Section -->
     <div class="row mb-4">
       <div class="col-md-4">
         <select v-model="selectedGenre" class="form-control bg-light border-0 small">
@@ -28,7 +27,6 @@
         </select>
       </div>
     </div>
-
     <!-- Movie Cards Grid -->
     <div class="row">D
       <FlippingCard
@@ -63,7 +61,7 @@ onMounted(() => {
 const movies = [
   {
     imdbID: 'tt0111161',
-    imageUrl: 'https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/M/MV5BMDAyY2FhYjctNDc5OS00MDNlLThiMGUtY2UxYWVkNGY2ZjljXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg',
     title: 'The Shawshank Redemption',
     director: 'Frank Darabont',
     publishedYear: 1994,
@@ -115,7 +113,7 @@ const movies = [
   },
   {
     imdbID: 'tt0133093',
-    imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfSjSWOCaw5dnDL2GT1zFd9RMCgUGw5Q2Cfg&s',
+    imageUrl: 'https://m.media-amazon.com/images/M/MV5BZGM1NDM3MTAtMmI0ZC00ZDAwLWEwY2EtNDdhYjZmMjJkNzM0XkEyXkFqcGc@._V1_.jpg',
     title: 'The Matrix',
     director: 'Lana Wachowski, Lilly Wachowski',
     publishedYear: 1999,

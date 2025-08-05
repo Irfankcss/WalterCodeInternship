@@ -50,3 +50,4 @@ export default {
 <style scoped>
 /* Add any specific styles for the Sidebar component here */
 </style>
+

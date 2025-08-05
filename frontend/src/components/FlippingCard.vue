@@ -77,7 +77,7 @@ defineProps({
   grid-template: 1fr / 1fr;
   grid-template-areas: "frontAndBack";
   transform-style: preserve-3d;
-  transition: all 0.7s ease;
+  transition: all 1s ease;
 }
 
 .card-flip div {
@@ -104,5 +104,12 @@ img{
 
 .btn {
   margin-top: 10px;
+}
+
+.btn-primary {
+  width:60%;
+  margin: auto;
+  display: block;
+  text-align: center;
 }
 </style>
