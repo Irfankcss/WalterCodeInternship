@@ -98,7 +98,7 @@
             </div>
 
             <div v-if="reviews.length">
-              <div v-for="review in reviews" :key="index" class="mb-3 border p-3 rounded">
+              <div v-for="(review,index) in reviews" :key="index" class="mb-3 border p-3 rounded">
                 <p class="mb-1"><strong>Rating:</strong> {{ review.rating }}/5</p>
                 <p class="mb-0"><em>{{ review.comment }}</em></p>
               </div>
@@ -138,7 +138,6 @@ import emitter from '@/utils/emitter';
 const userStore = useUserStore();
 const route = useRoute();
 const id = route.params.id;
-const praviid = route.params.id;
 
 const movie = ref(null);
 const copies = ref([]);
@@ -156,45 +155,74 @@ const toggleShowCopies = () => {
   returnDate.value = null;
 };
 
-const activeRentals = computed(() => {
-  const todayDate = new Date();
-  todayDate.setHours(0, 0, 0, 0);
-  return userStore.user.rentals?.filter(r => {
-    const rentedDate = new Date(r.rentedUntil);
-    rentedDate.setHours(0, 0, 0, 0);
-    return rentedDate >= todayDate;
-  }) || [];
-});
+const fetchCopies = async () => {
+  try {
+    const res = await fetch(`http://localhost:5222/api/Movie/${id}`);
+    const data = await res.json();
+    copies.value = data.movieCopies || [];
+  } catch (error) {
+    console.error('Error fetching movie copies:', error);
+  }
+};
 
-const confirmRent = () => {
+const confirmRent = async () => {
   const copy = copies.value.find(c => c.id === selectedCopyId.value);
-  if (copy && returnDate.value) {
-    if (activeRentals.value.length >= 3) {
-      alert("⚠️ You can't rent more than 3 movies at the same time.");
+  if (!copy || !returnDate.value) {
+    emitter.emit("toast", {
+      message: "⚠️ Please select a copy and return date.",
+      type: "error"
+    });
+    return;
+  }
+  const userId = 1;
+  
+const payload = {
+  movieId: Number(id),
+  movieCopyId: copy.id, 
+  borrowedById: 1,
+  borrowedToId: userId,
+  returnDate: returnDate.value
+};
+
+  try {
+    const res = await fetch("http://localhost:5222/api/Rental", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const responseText = await res.text();
+
+    if (!res.ok) {
+      console.error('❌ Rent error:', responseText);
+      emitter.emit("toast", {
+        message: "❌ Rent failed: " + responseText,
+        type: "error"
+      });
       return;
     }
 
-    const newRental = {
-      title: movie.value.name,
-      serialNumber: copy.serialNumber,
-      rentedUntil: returnDate.value
-    };
+    emitter.emit("toast", {
+      message: `✅ Movie rented successfully until ${returnDate.value}`,
+      type: "success"
+    });
 
-    userStore.user.rentals.push(newRental);
-    localStorage.setItem('rentals', JSON.stringify(userStore.user.rentals));
-    window.dispatchEvent(new Event('storage'));
-    alert(`✅ Rental confirmed for '${copy.serialNumber}' until ${returnDate.value}`);
+    await fetchCopies();
 
     showCopies.value = false;
     selectedCopyId.value = null;
     returnDate.value = null;
+
+  } catch (err) {
+    console.error("❌ Rent request failed:", err);
+    emitter.emit("toast", {
+      message: "❌ Could not process rental. Try again later.",
+      type: "error"
+    });
   }
 };
-
-const savedFavorites = localStorage.getItem('favorites');
-if (savedFavorites) {
-  userStore.user.favoriteMovies = JSON.parse(savedFavorites);
-}
 
 const isFavorite = computed(() => {
   return movie.value && userStore.user.favoriteMovies.includes(movie.value.id);
@@ -206,6 +234,7 @@ const toggleFavorite = () => {
     localStorage.setItem('favorites', JSON.stringify(userStore.user.favoriteMovies));
   }
 };
+
 const submitReview = async () => {
   if (!newReview.value.comment || !newReview.value.rating) {
     alert('Please enter a comment and rating.');
@@ -214,10 +243,8 @@ const submitReview = async () => {
 
   const token = localStorage.getItem('token');
   const decodedToken = jwtDecode(token);
-
   const userId = decodedToken.UserId || decodedToken.userId;
 
-  // 🟡 Provjera da li korisnik već ima recenziju
   const alreadyExists = reviews.value.some(
     r => r.userId === userId || r.userID === userId
   );
@@ -250,6 +277,7 @@ const submitReview = async () => {
 
     if (!response.ok) {
       console.error('❌ Server response:', responseText);
+
       if (responseText.includes("Duplicate entry")) {
         emitter.emit("toast", {
           message: "⚠️ You have already reviewed this movie.",
@@ -258,33 +286,40 @@ const submitReview = async () => {
         return;
       }
 
-    throw new Error(`Server error: ${response.status}`);
-  }
+      throw new Error(`Server error: ${response.status}`);
+    }
 
     const savedReview = JSON.parse(responseText);
 
-  reviews.value.push({
-    rating: savedReview.rating,
-    comment: savedReview.comment,
-    userId: userId
-  });
+    reviews.value.push({
+      rating: savedReview.rating,
+      comment: savedReview.comment,
+      userId: userId
+    });
 
-  newReview.value.comment = '';
-  newReview.value.rating = '';
+    newReview.value.comment = '';
+    newReview.value.rating = '';
 
-  alert('✅ Review successfully submitted!');
-} catch (error) {
-  console.error('❌ Error submitting review:', error.message);
-}
+    emitter.emit("toast", {
+      message: "✅ Review submitted successfully!",
+      type: "success"
+    });
+  } catch (error) {
+    console.error('❌ Error submitting review:', error);
+
+    emitter.emit("toast", {
+      message: `❌ Error submitting review: ${error.message}`,
+      type: "error"
+    });
+  }
 };
-
-
 
 const actors = ref([]);
 const genre = ref('');
 const reviews = ref([]);
+const rental = ref([]);
 
-onMounted(() => {
+onMounted(async () => {
   fetch(`http://localhost:5222/api/MovieRatings`)
     .then(res => res.json())
     .then(data => {
@@ -292,16 +327,21 @@ onMounted(() => {
     })
     .catch(err => console.error('Error fetching reviews:', err));
 
-  fetch
+  fetch(`http://localhost:5222/api/Rental`)
+    .then(res => res.json())
+    .then(data => {
+      rental.value = data.filter(r => r.movieId === Number(id));
+    })
+    .catch(err => console.error('Error fetching rentals:', err));
 
   fetch(`http://localhost:5222/api/Actor/GetByMovieID?MovieId=${id}`)
     .then(res => res.json())
     .then(data => {
-      actors.value = data
+      actors.value = data;
     })
     .catch(err => console.error('Error fetching actors:', err));
 
-  fetch(`http://localhost:5222/api/Movie/${praviid}/genres`)
+  fetch(`http://localhost:5222/api/Movie/${id}/genres`)
     .then(async res => {
       if (!res.ok) throw new Error(`API error: ${res.status}`);
       const text = await res.text();
@@ -326,10 +366,12 @@ onMounted(() => {
         director: data.director?.name || '',
         reviews: JSON.parse(localStorage.getItem(`reviews_${data.id}`)) || []
       };
-      copies.value = data.movieCopies || [];
     });
+
+  await fetchCopies();
 });
 </script>
+
 
 <style scoped>
 .movie-details-container {

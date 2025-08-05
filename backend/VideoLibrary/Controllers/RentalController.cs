@@ -77,7 +77,7 @@ namespace VideoLibrary.Controllers
                 ReturnDate = dto.ReturnDate,
                 BorrowedToId = dto.BorrowedToId,
                 MovieCopyId = dto.MovieCopyId,
-                BorrowedById = dto.BorrowedById
+                BorrowedById = 1
             };
 
             _context.Rentals.Add(rental);
