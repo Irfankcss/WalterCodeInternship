@@ -49,7 +49,7 @@ const router = createRouter({
       component: () => import('../views/Login/ForgotPasswordView.vue'),
     },
     {
-      path: '/movie/:imdbID',
+      path: '/movie/:id',
       name: 'MovieDetails',
       component: () => import('../views/MovieDetails.vue'),
       meta: { title: 'Detalji filma' },

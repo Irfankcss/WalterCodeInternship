@@ -41,13 +41,14 @@
           <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
         </div>
       </li>
-      <!-- Nav Item - User Information -->
+
+      <!-- User Info -->
       <li v-if="!isLoggedin" class="nav-item d-flex align-items-center justify-content-center gap-2">
         <button class="btn btn-primary me-2" type="button" @click="$router.push('/login')">Login</button>
         <button class="btn btn-success" type="button" @click="$router.push('/register')">Register</button>
       </li>
-      <li v-else class="nav-item dropdown no-arrow">
 
+      <li v-else class="nav-item dropdown no-arrow">
         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ username }}</span>
           <img class="img-profile rounded-circle" src="../../static/sbadmin/img/undraw_profile.svg">
@@ -57,8 +58,8 @@
             <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
             Profile
           </router-link>
-          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                      <a class="dropdown-item" href="#" data-toggle="modal" v-on:click="logout()" data-target="#logoutModal"></a>
+          <a class="dropdown-item" href="#" @click.prevent="logout">
+            <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
             Logout
           </a>
         </div>
@@ -68,19 +69,21 @@
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue'
-import jwtDecode from "jwt-decode";
-import emitter from "@/utils/emitter.js";
+import { ref, onMounted } from 'vue'
+import jwtDecode from "jwt-decode"
+import emitter from "@/utils/emitter.js"
+
 const username = ref("")
+const isLoggedin = ref(false)
+
 onMounted(() => {
   isLoggedin.value = !!localStorage.getItem('token')
-  if(isLoggedin.value) {
+  if (isLoggedin.value) {
     const token = localStorage.getItem('token')
     const decodedToken = jwtDecode(token)
     username.value = decodedToken.unique_name
   }
 })
-
 
 emitter.on("userLoggedIn", () => {
   const token = localStorage.getItem('token')
@@ -90,12 +93,12 @@ emitter.on("userLoggedIn", () => {
     isLoggedin.value = true
   }
 })
+
 const logout = () => {
   localStorage.removeItem('token')
   isLoggedin.value = false
   window.location.reload()
 }
-const isLoggedin = ref(false)
 </script>
 
 <style scoped>

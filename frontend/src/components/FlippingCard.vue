@@ -7,6 +7,7 @@
         <div class="card-block">
         </div>
       </div>
+      <!-- End Card 2 Front -->
 
       <!-- Card 2 Back -->
       <div class="card back">
@@ -18,11 +19,12 @@
           <h4 class="card-title">{{ title }}</h4>
           <p class="card-text"><small class="text-muted">{{ director }} ({{ publishedYear }})</small></p>
           <p class="card-text">{{ backText }}</p>
-          <router-link :to="{ name: 'MovieDetails', params: { imdbID: movieId } }" class="btn btn-primary">
+          <router-link :to="{ name: 'MovieDetails', params: { id: movieId } }" class="btn btn-primary">
             Details
           </router-link>
         </div>
       </div>
+      <!-- End Card 2 Back -->
     </div>
   </div>
 </template>
@@ -30,9 +32,10 @@
 <script setup>
 defineProps({
   movieId: {
-    type: String,
+    type: [String, Number],
     required: true
   },
+
   imageUrl: {
     type: String,
     required: true
@@ -55,6 +58,14 @@ defineProps({
   backText: {
     type: String,
     default: 'No description available.'
+  },
+  link: {
+    type: String,
+    default: '#'
+  },
+  linkTitle: {
+    type: String,
+    default: 'View More'
   }
 })
 </script>
@@ -69,15 +80,17 @@ defineProps({
   display: grid;
   perspective: 700px;
 }
-.card-block{
-    margin: 10px;
+
+.card-block {
+  margin: 10px;
 }
+
 .card-flip {
   display: grid;
   grid-template: 1fr / 1fr;
   grid-template-areas: "frontAndBack";
   transform-style: preserve-3d;
-  transition: all 1s ease;
+  transition: all 0.7s ease;
 }
 
 .card-flip div {
@@ -97,19 +110,9 @@ defineProps({
 .card-container:hover .card-flip {
   transform: rotateY(180deg);
 }
-img{
+
+img {
   height: 100%;
   width: 100%;
-}
-
-.btn {
-  margin-top: 10px;
-}
-
-.btn-primary {
-  width:60%;
-  margin: auto;
-  display: block;
-  text-align: center;
 }
 </style>
