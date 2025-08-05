@@ -73,7 +73,7 @@ namespace VideoLibrary.Controllers
         {
             var rental = new Rental
             {
-                Date = dto.Date,
+                Date = DateTime.Now,
                 ReturnDate = dto.ReturnDate,
                 BorrowedToId = dto.BorrowedToId,
                 MovieCopyId = dto.MovieCopyId,

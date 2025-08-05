@@ -145,7 +145,7 @@ const newReview = ref({ comment: '', rating: '' });
 
 const selectedCopyId = ref(null);
 const returnDate = ref(null);
-const today = new Date().toISOString().split('T')[0];
+const today = new Date().toLocaleDateString('en-CA');
 const maxReturnDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
 const showCopies = ref(false);
@@ -174,15 +174,18 @@ const confirmRent = async () => {
     });
     return;
   }
-  const userId = 1;
-  
-const payload = {
-  movieId: Number(id),
-  movieCopyId: copy.id, 
-  borrowedById: 1,
-  borrowedToId: userId,
-  returnDate: returnDate.value
-};
+
+const token = localStorage.getItem('token');
+const decodedToken = jwtDecode(token);
+const userId = decodedToken.UserId;
+
+  const payload = {
+    movieId: Number(id),
+    movieCopyId: copy.id,
+    borrowedById: 1,
+    borrowedToId: userId,
+    returnDate: returnDate.value
+  };
 
   try {
     const res = await fetch("http://localhost:5222/api/Rental", {
