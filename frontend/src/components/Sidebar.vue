@@ -3,7 +3,7 @@ import { useRouter } from 'vue-router'
 import isAdmin from '@/utils/auth'
 
 const router = useRouter()
-const sidebarFilteredRoutes = ['Profile', 'Login', 'Register', 'Movie Copies', 'ForgotPassword']
+const sidebarFilteredRoutes = ['Profile', 'Login', 'Register', 'Movie Copies', 'ForgotPassword','MovieDetails', 'UserProfile', 'Movie Ratings', 'Movie Copies', 'Rental History', 'AdminPanel']
 
 const routes = router.options.routes.filter(route => {
   if (sidebarFilteredRoutes.includes(route.name))
