@@ -9,7 +9,10 @@ onMounted(() => {
   fetchUsers()
 })
 const fetchUsers = function () {
-  fetch("http://localhost:5222/api/User")
+  fetch("http://localhost:5222/api/User",{  method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }})
     .then(response => response.json())
     .then(data => {
       users.value = data
