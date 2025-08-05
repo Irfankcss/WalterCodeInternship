@@ -3,7 +3,7 @@
     <div class="card profile-card shadow-lg p-4">
       <div class="row align-items-center">
         <div class="col-md-4 profile-left text-center">
-          <img :src="tempAvatar" alt="Avatar" class="rounded-circle avatar-img mb-3" />
+          <img :src= UniversalImage alt="Avatar" class="rounded-circle avatar-img mb-3" />
           <h4 class="text-primary fw-bold mb-0">{{ user.name }}</h4>
           <p class="text-muted">@{{ user.username }}</p>
         </div>
@@ -22,31 +22,7 @@
               <input :type="key === 'email' ? 'email' : key === 'dob' ? 'date' : 'text'"
                      v-model="form[key]" class="form-control" required />
             </div>
-
-            <div class="mb-3">
-              <label class="form-label">Change Avatar</label>
-              <input type="file" accept="image/*" @change="handleAvatarUpload" class="form-control" />
-            </div>
-
-            <div class="d-flex justify-content-end gap-2 mb-3">
-              <button type="button" class="btn btn-outline-warning" @click="showPasswordFields = !showPasswordFields">
-                {{ showPasswordFields ? 'Cancel Password Change' : 'Change Password' }}
-              </button>
               <button type="submit" class="btn btn-success">Save Changes</button>
-            </div>
-
-            <div v-if="showPasswordFields">
-              <div class="mb-3">
-                <label class="form-label">Current Password</label>
-                <input type="password" v-model="passwordForm.current" class="form-control" />
-              </div>
-              <div class="mb-3">
-                <label class="form-label">New Password</label>
-                <input type="password" v-model="passwordForm.new" class="form-control" />
-              </div>
-              <p v-if="passwordError" class="text-danger">{{ passwordError }}</p>
-              <p v-if="passwordSuccess" class="text-success">{{ passwordSuccess }}</p>
-            </div>
           </form>
 
           <div v-else>
@@ -94,15 +70,15 @@
         <thead>
           <tr>
             <th>Title</th>
-            <th>Serial Number</th>
-            <th>Rented Until</th>
+            <th>Rent date</th>
+            <th>Borrowed by</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(r, i) in activeRentals" :key="'a' + i">
-            <td>{{ r.title }}</td>
-            <td>{{ r.serialNumber }}</td>
-            <td>{{ r.rentedUntil }}</td>
+          <tr v-for="(r, i) in activeRentals" :key="r.id">
+            <td>{{ r.movieTitle }}</td>
+            <td>{{ r.date }}</td>
+            <td>{{ r.borrowedByName }}</td>
           </tr>
         </tbody>
       </table>
@@ -113,15 +89,15 @@
         <thead>
           <tr>
             <th>Title</th>
-            <th>Serial Number</th>
+            <th>Rented date</th>
             <th>Returned On</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(r, i) in pastRentals" :key="'p' + i">
-            <td>{{ r.title }}</td>
-            <td>{{ r.serialNumber }}</td>
-            <td>{{ r.rentedUntil }}</td>
+          <tr v-for="(r, i) in pastRentals" :key="r.id">
+            <td>{{ r.movieTitle }}</td>
+            <td>{{ r.date }}</td>
+            <td>{{ r.returnDate }}</td>
           </tr>
         </tbody>
       </table>
@@ -131,171 +107,88 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed, onMounted, onUnmounted } from 'vue'
-import { useUserStore } from '@/stores/userStore'
-import { mockMovies } from '@/seeders/userData'
+import { ref, reactive, computed, onMounted } from 'vue'
+import jwtDecode from 'jwt-decode'
 
-const userStore = useUserStore()
-const user = userStore.user
-
-try {
-  const rawUser = localStorage.getItem('userData');
-  if (rawUser && rawUser !== "undefined") {
-    const userData = JSON.parse(rawUser);
-    Object.assign(user, userData);
-  }
-} catch (error) {
-  console.error("Greška prilikom učitavanja userData:", error);
-}
-
-try {
-  const favs = localStorage.getItem('favorites');
-  if (favs && favs !== "undefined") {
-    user.favoriteMovies = JSON.parse(favs);
-  }
-} catch (error) {
-  console.error("Greška prilikom učitavanja favorites:", error);
-}
-
-if (!user.rentals) user.rentals = []; //safe option
-
-const rentals = JSON.parse(localStorage.getItem('rentals'));
-rentals.push({
-  title: "The Dark Knight",
-  serialNumber: "SN004",
-  rentedUntil: "2024-07-30"
-}, {
-  title: "The Godfather",
-  serialNumber: "SN003",
-    rentedUntil: "2023-08-15"
+const user = reactive({
+  id: null,
+  name: '',
+  username: '',
+  email: '',
+  dob: '',
+  avatarUrl: '',
+  favoriteMovies: [],
+  rentals: []
 })
-localStorage.setItem('rentals', JSON.stringify(rentals));
 
-const seedRentals = [
-  {
-    title: "The Godfather",
-    serialNumber: "SN003",
-    rentedUntil: "2025-08-15" 
-  },
-  {
-    title: "The Dark Knight",
-    serialNumber: "SN004",
-    rentedUntil: "2024-07-30" 
-  }
-];
-
-const rentalsFromStorage = localStorage.getItem('rentals');
-if (!rentalsFromStorage || rentalsFromStorage === "undefined") {
-  localStorage.setItem('rentals', JSON.stringify(seedRentals));
-  user.rentals = seedRentals;
-} else {
-  try {
-    const parsed = JSON.parse(rentalsFromStorage);
-    user.rentals = parsed;
-  } catch (error) {
-    console.error("Neispravan JSON za 'rentals':", error);
-    user.rentals = [];
-  }
-}
-
-const refreshRentals = () => {
-  const stored = localStorage.getItem('rentals');
-  if (stored && stored !== "undefined") {
-    try {
-      user.rentals = JSON.parse(stored);
-    } catch (e) {
-      console.error("Greška u parsiranju rentals pri refreshu:", e);
-    }
-  }
-};
-
-onMounted(() => {
-  window.addEventListener('storage', refreshRentals);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('storage', refreshRentals);
-});
-
+const UniversalImage = ref('https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png')
 const isEditing = ref(false)
-const showPasswordFields = ref(false)
 const successMessage = ref('')
-const passwordError = ref('')
-const passwordSuccess = ref('')
-const tempAvatar = ref(user.avatarUrl || '')
+const tempAvatar = ref('')
 const showHistory = ref(false)
+let userId = null
 
-const today = new Date();
-today.setHours(0, 0, 0, 0); 
-
-const activeRentals = computed(() =>
-  user.rentals?.filter(r => {
-    const rentedDate = new Date(r.rentedUntil);
-    rentedDate.setHours(0, 0, 0, 0);
-    return rentedDate >= today;
-  }) || []
-);
-
-const pastRentals = computed(() =>
-  user.rentals?.filter(r => {
-    const rentedDate = new Date(r.rentedUntil);
-    rentedDate.setHours(0, 0, 0, 0);
-    return rentedDate < today;
-  }) || []
-);
-
-const formLabels = {
-  name: 'Full Name',
-  username: 'Username',
-  email: 'Email',
-  dob: 'Date of Birth'
-}
 
 const form = reactive({
-  name: user.name,
-  username: user.username,
-  email: user.email,
-  dob: user.dob
+  name: '',
+  username: '',
+  email: '',
+  dob: ''
 })
 
-const passwordForm = reactive({ current: '', new: '' })
 
 const toggleEdit = () => {
   if (isEditing.value) {
     Object.assign(form, user)
     tempAvatar.value = user.avatarUrl
-    passwordForm.current = passwordForm.new = ''
-    passwordError.value = passwordSuccess.value = successMessage.value = ''
-    showPasswordFields.value = false
   }
   isEditing.value = !isEditing.value
 }
 
-const saveChanges = () => {
+const saveChanges = async () => {
   if (!form.name || !form.username || !form.email || !form.dob) {
     alert('Please fill in all required fields.')
     return
   }
 
-  if (showPasswordFields.value) {
-    if (passwordForm.current !== user.password) {
-      passwordError.value = 'Current password is incorrect.'
-      return
-    }
-    if (!passwordForm.new.trim() || passwordForm.new === passwordForm.current) {
-      passwordError.value = 'New password must be different and not empty.'
-      return
-    }
-    user.password = passwordForm.new
-    passwordSuccess.value = 'Password changed successfully.'
+  const token = localStorage.getItem('token')
+  if (!token) return
+
+
+
+  const updatedData = {
+    name: form.name,
+    username: form.username,
+    email: form.email,
+    dob: new Date(form.dob).toISOString(),
+    admin: user.admin
   }
 
-  Object.assign(user, form)
-  user.avatarUrl = tempAvatar.value
-  localStorage.setItem('userData', JSON.stringify(user));
-  localStorage.setItem('favorites', JSON.stringify(user.favoriteMovies)); 
-  successMessage.value = 'Profile updated successfully.'
-  isEditing.value = false
+  try {
+    const response = await fetch(`http://localhost:5222/api/User/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(updatedData)
+    })
+
+    if (!response.ok) throw new Error('Failed to update user')
+
+    let updatedUser = {}
+    const text = await response.text()
+    if (text) updatedUser = JSON.parse(text)
+
+    Object.assign(user, updatedUser)
+    Object.assign(form, updatedUser)
+    tempAvatar.value = updatedUser.avatarUrl || ''
+    emitter.emit("toast", {message: "Profile updated successfully.", type: "success"})
+    isEditing.value = false
+    await fetchUserProfile()
+  } catch (err) {
+    emitter.emit("toast", {message: "Failed to update profile." + err.message, type: "error"})
+  }
 }
 
 const handleAvatarUpload = (e) => {
@@ -310,10 +203,91 @@ const handleAvatarUpload = (e) => {
 
 const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-GB')
 
+const formLabels = {
+  name: 'Full Name',
+  username: 'Username',
+  email: 'Email',
+  dob: 'Date of Birth'
+}
+
+const fetchUserProfile = async () => {
+  const token = localStorage.getItem('token')
+  if (!token) return
+  const decoded = jwtDecode(token)
+  const userId = Number(decoded.UserId)
+
+  try {
+    const response = await fetch(`http://localhost:5222/api/User/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    if (!response.ok) throw new Error('Failed to fetch user')
+
+    const data = await response.json()
+    Object.assign(user, data)
+    Object.assign(form, data)
+    tempAvatar.value = data.avatarUrl || ''
+  } catch (err) {
+    console.error('Error fetching user:', err)
+  }
+}
+
+onMounted(() => {
+
+  const token = localStorage.getItem('token')
+  if(!token)window.location.href = "/login"
+  const decoded = jwtDecode(token)
+  userId = Number(decoded.UserId)
+
+  fetchUserProfile()
+  fetchRentals()
+})
+
+const fetchRentals = async () => {
+  try {
+    const response = await fetch('http://localhost:5222/api/Rental', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    if (!response.ok) throw new Error('Failed to fetch rentals')
+
+    const data = await response.json()
+    user.rentals = await data.filter(r => r.borrowedToId === userId)
+  } catch (err) {
+    console.error('Error fetching rentals:', err)
+  }
+}
+
+import { mockMovies } from '@/seeders/userData'
+import emitter from "@/utils/emitter.js";
+
 const favoriteMoviesList = computed(() => {
   return mockMovies.filter(m => user.favoriteMovies.includes(m.imdbID))
 })
+
+const today = new Date()
+today.setHours(0, 0, 0, 0)
+
+const activeRentals = computed(() =>
+  user.rentals?.filter(r => {
+    const rentedDate = new Date(r.returnDate)
+    rentedDate.setHours(0, 0, 0, 0)
+    return rentedDate >= today
+  }) || []
+)
+
+const pastRentals = computed(() =>
+  user.rentals?.filter(r => {
+    const rentedDate = new Date(r.returnDate)
+    rentedDate.setHours(0, 0, 0, 0)
+    return rentedDate < today
+  }) || []
+)
 </script>
+
 
 
 <style scoped>

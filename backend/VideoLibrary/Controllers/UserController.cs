@@ -90,7 +90,7 @@ namespace VideoLibrary.Controllers
         // PUT: api/user/5
         // Updates an existing user's data
         // Can be used by admin or for profile editing
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] UserUpdateDto dto)
         {
@@ -99,7 +99,6 @@ namespace VideoLibrary.Controllers
                 return NotFound();
 
             user.Username = dto.Username;
-            user.Password = dto.Password;
             user.Email = dto.Email;
             user.Name = dto.Name;
             user.Dob = dto.Dob;
