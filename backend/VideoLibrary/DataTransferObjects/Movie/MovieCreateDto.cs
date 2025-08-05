@@ -15,7 +15,7 @@ namespace VideoLibrary.DataTransferObjects.Movie
         [Required(ErrorMessage = "Poster URL is required")]
         public string Poster { get; set; }
         [Required(ErrorMessage = "Description is required")]
-        public int DirectorId { get; set; }
+        public int DirectorId { get; set; } = 1;
         [Required(ErrorMessage = "Edited by user ID is required")]
         public int EditedById { get; set; }
 

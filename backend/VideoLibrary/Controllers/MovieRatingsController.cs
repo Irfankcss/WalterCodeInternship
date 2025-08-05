@@ -44,7 +44,7 @@ namespace VideoLibrary.Controllers
         // POST: api/movieratings
         // Adds a new rating for a movie by a user.
         // Called when a user submits a new review
-        [Authorize]
+       
         [HttpPost]
         public async Task<ActionResult<MovieRating>> Create([FromBody] MovieRatingCreateDto dto)
         {

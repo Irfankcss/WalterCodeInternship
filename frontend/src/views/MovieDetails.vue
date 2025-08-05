@@ -78,8 +78,8 @@
           <section class="movie-section">
             <h2 class="section-title">Cast</h2>
             <div class="cast-grid">
-              <div class="cast-member" v-for="actor in mainCast" :key="actor.name">
-                <img :src="actor.image" :alt="actor.name" class="actor-avatar" />
+              <div class="cast-member" v-for="actor in actors" :key="actor.id">
+                <!-- <img :src="actor.image" :alt="actor.name" class="actor-avatar" /> -->
                 <span class="actor-name">{{ actor.name }}</span>
               </div>
             </div>
@@ -97,8 +97,8 @@
               <button class="btn btn-success" @click="submitReview">Add review</button>
             </div>
 
-            <div v-if="movie.reviews.length">
-              <div v-for="(review, index) in movie.reviews" :key="index" class="mb-3 border p-3 rounded">
+            <div v-if="reviews.length">
+              <div v-for="review in reviews" :key="index" class="mb-3 border p-3 rounded">
                 <p class="mb-1"><strong>Rating:</strong> {{ review.rating }}/5</p>
                 <p class="mb-0"><em>{{ review.comment }}</em></p>
               </div>
@@ -132,6 +132,8 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
+import jwtDecode from 'jwt-decode';
+import emitter from '@/utils/emitter';
 
 const userStore = useUserStore();
 const route = useRoute();
@@ -204,32 +206,101 @@ const toggleFavorite = () => {
     localStorage.setItem('favorites', JSON.stringify(userStore.user.favoriteMovies));
   }
 };
-
-const mainCast = ref([
-  { name: 'Tim Robbins', image: 'https://ntvb.tmsimg.com/assets/assets/680595_v9_bc.jpg' },
-  { name: 'Morgan Freeman', image: 'https://m.media-amazon.com/images/M/MV5BMTc0MDMyMzI2OF5BMl5BanBnXkFtZTcwMzM2OTk1MQ@@._V1_FMjpg_UX1000_.jpg' },
-  { name: 'Bob Gunton', image: '...' },
-  { name: 'Clancy Brown', image: '...' }
-]);
-
-const submitReview = () => {
+const submitReview = async () => {
   if (!newReview.value.comment || !newReview.value.rating) {
     alert('Please enter a comment and rating.');
     return;
   }
 
-  movie.value.reviews.push({
-    comment: newReview.value.comment,
-    rating: newReview.value.rating
+  const token = localStorage.getItem('token');
+  const decodedToken = jwtDecode(token);
+
+  const userId = decodedToken.UserId || decodedToken.userId;
+
+  // 🟡 Provjera da li korisnik već ima recenziju
+  const alreadyExists = reviews.value.some(
+    r => r.userId === userId || r.userID === userId
+  );
+
+  if (alreadyExists) {
+    emitter.emit("toast", {
+      message: "⚠️ You have already reviewed this movie.",
+      type: "error"
+    });
+    return;
+  }
+
+  const reviewPayload = {
+    movieID: Number(id),
+    userID: userId,
+    rating: Number(newReview.value.rating),
+    comment: newReview.value.comment
+  };
+
+  try {
+    const response = await fetch('http://localhost:5222/api/MovieRatings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(reviewPayload)
+    });
+
+    const responseText = await response.text();
+
+    if (!response.ok) {
+      console.error('❌ Server response:', responseText);
+      if (responseText.includes("Duplicate entry")) {
+        emitter.emit("toast", {
+          message: "⚠️ You have already reviewed this movie.",
+          type: "error"
+        });
+        return;
+      }
+
+    throw new Error(`Server error: ${response.status}`);
+  }
+
+    const savedReview = JSON.parse(responseText);
+
+  reviews.value.push({
+    rating: savedReview.rating,
+    comment: savedReview.comment,
+    userId: userId
   });
 
-  localStorage.setItem(`reviews_${movie.value.id}`, JSON.stringify(movie.value.reviews));
   newReview.value.comment = '';
   newReview.value.rating = '';
+
+  alert('✅ Review successfully submitted!');
+} catch (error) {
+  console.error('❌ Error submitting review:', error.message);
+}
 };
+
+
+
+const actors = ref([]);
 const genre = ref('');
+const reviews = ref([]);
 
 onMounted(() => {
+  fetch(`http://localhost:5222/api/MovieRatings`)
+    .then(res => res.json())
+    .then(data => {
+      reviews.value = data.filter(r => r.movieId === Number(id));
+    })
+    .catch(err => console.error('Error fetching reviews:', err));
+
+  fetch
+
+  fetch(`http://localhost:5222/api/Actor/GetByMovieID?MovieId=${id}`)
+    .then(res => res.json())
+    .then(data => {
+      actors.value = data
+    })
+    .catch(err => console.error('Error fetching actors:', err));
+
   fetch(`http://localhost:5222/api/Movie/${praviid}/genres`)
     .then(async res => {
       if (!res.ok) throw new Error(`API error: ${res.status}`);
