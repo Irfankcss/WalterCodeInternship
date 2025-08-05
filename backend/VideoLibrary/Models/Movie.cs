@@ -11,6 +11,7 @@ namespace VideoLibrary.Models
         public int Year { get; set; }
         public string? ImdbId { get; set; }
         public double? ImdbRating { get; set; }
+        public string? Description { get; set; }
         public string? Poster { get; set; }
         [ForeignKey(nameof(DirectorId))]
         public int DirectorId { get; set; }
@@ -21,5 +22,7 @@ namespace VideoLibrary.Models
         public bool IsDeleted { get; set; }
         public DateTime? DeleteDate { get; set; }
         public List<MovieCopy> MovieCopies { get; set; } = new List<MovieCopy>();
+        public ICollection<UserFavoriteMovie> UserFavoriteMovies { get; set; } = new List<UserFavoriteMovie>();
+
     }
 }

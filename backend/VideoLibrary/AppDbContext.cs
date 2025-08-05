@@ -45,6 +45,19 @@ namespace VideoLibrary
                 .HasForeignKey(r => r.BorrowedToId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<UserFavoriteMovie>()
+        .HasKey(uf => new { uf.UserId, uf.MovieId });
+
+            modelBuilder.Entity<UserFavoriteMovie>()
+                .HasOne(uf => uf.User)
+                .WithMany(u => u.UserFavoriteMovies)
+                .HasForeignKey(uf => uf.UserId);
+
+            modelBuilder.Entity<UserFavoriteMovie>()
+                .HasOne(uf => uf.Movie)
+                .WithMany(m => m.UserFavoriteMovies)
+                .HasForeignKey(uf => uf.MovieId);
+
         }
 
         public DbSet<Genre> Genres { get; set; }
@@ -57,6 +70,7 @@ namespace VideoLibrary
             public DbSet<Rental> Rentals { get; set; }
             public DbSet<MovieHasActor> MovieHasActors { get; set; }
             public DbSet<GenreHasMovie> GenreHasMovies { get; set; }
+            public DbSet<UserFavoriteMovie> UserFavoriteMovies { get; set; }
 
 
     }

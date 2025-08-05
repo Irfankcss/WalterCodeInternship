@@ -48,13 +48,15 @@
     <div class="mt-5">
       <h4 class="mb-3">Favorite Movies</h4>
       <div class="row">
-        <div class="col-md-3 mb-4" v-for="movie in favoriteMoviesList" :key="movie.imdbID">
+        <div class="col-md-3 mb-4" v-for="movie in favoriteMoviesList" :key="movie.movieId">
           <div class="card h-100 shadow-sm">
-            <img :src="movie.imageUrl" class="card-img-top" alt="Poster" />
+            <img :src="movie.moviePoster" class="card-img-top" alt="Poster" />
             <div class="card-body">
-              <h5 class="card-title">{{ movie.title }}</h5>
-              <p class="card-text text-muted">{{ movie.director }}</p>
-              <router-link :to="{ name: 'MovieDetails', params: { imdbID: movie.imdbID } }" class="btn btn-primary btn-sm">
+              <h5 class="card-title">{{ movie.movieTitle }}</h5>
+              <router-link
+                :to="{ name: 'MovieDetails', params: { id: movie.movieId } }"
+                class="btn btn-primary btn-sm"
+              >
                 Details
               </router-link>
             </div>
@@ -62,6 +64,7 @@
         </div>
       </div>
     </div>
+
 
     <!-- Rental History Section -->
     <div v-if="showHistory" class="mt-5">
@@ -191,16 +194,6 @@ const saveChanges = async () => {
   }
 }
 
-const handleAvatarUpload = (e) => {
-  const file = e.target.files[0]
-  if (!file) return
-  const reader = new FileReader()
-  reader.onload = (event) => {
-    tempAvatar.value = event.target.result
-  }
-  reader.readAsDataURL(file)
-}
-
 const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-GB')
 
 const formLabels = {
@@ -243,6 +236,8 @@ onMounted(() => {
 
   fetchUserProfile()
   fetchRentals()
+  fetchFavorites();
+
 })
 
 const fetchRentals = async () => {
@@ -264,9 +259,30 @@ const fetchRentals = async () => {
 import { mockMovies } from '@/seeders/userData'
 import emitter from "@/utils/emitter.js";
 
-const favoriteMoviesList = computed(() => {
-  return mockMovies.filter(m => user.favoriteMovies.includes(m.imdbID))
-})
+const favoriteMoviesList = ref([]);
+const fetchFavorites = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+
+  const decoded = jwtDecode(token);
+  const userId = decoded.UserId || decoded.userId;
+
+  try {
+    const response = await fetch(`http://localhost:5222/api/UserFavoriteMovies/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch favorites');
+    const data = await response.json();
+
+    favoriteMoviesList.value = data;
+  } catch (err) {
+    console.error('Error fetching favorites:', err);
+  }
+};
+
 
 const today = new Date()
 today.setHours(0, 0, 0, 0)

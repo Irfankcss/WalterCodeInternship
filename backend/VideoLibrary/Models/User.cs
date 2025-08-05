@@ -18,5 +18,7 @@ namespace VideoLibrary.Models
         public bool Admin { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime? DeleteDate { get; set; }
+        public ICollection<UserFavoriteMovie> UserFavoriteMovies { get; set; } = new List<UserFavoriteMovie>();
+
     }
 }

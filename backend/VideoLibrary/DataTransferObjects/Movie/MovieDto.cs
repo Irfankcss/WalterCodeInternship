@@ -11,6 +11,7 @@ namespace VideoLibrary.DataTransferObjects.Movie
         public string? ImdbId { get; set; }
         public double? ImdbRating { get; set; }
         public string? Poster { get; set; }
+        public string? Description { get; set; }
 
         public int DirectorId { get; set; }
         public Models.Director Director { get; set; }

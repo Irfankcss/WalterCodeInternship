@@ -12,6 +12,8 @@ namespace VideoLibrary.DataTransferObjects.Movie
         public string ImdbId { get; set; }
         [Required(ErrorMessage = "Description is required")]
         public double? ImdbRating { get; set; }
+        [Required(ErrorMessage = "Description is required")]
+        public string Description { get; set; }
         [Required(ErrorMessage = "Poster URL is required")]
         public string Poster { get; set; }
         [Required(ErrorMessage = "Description is required")]

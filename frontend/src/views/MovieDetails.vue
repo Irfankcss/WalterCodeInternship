@@ -164,12 +164,27 @@ const fetchCopies = async () => {
     console.error('Error fetching movie copies:', error);
   }
 };
+const fetchFavoriteStatus = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+
+  const decodedToken = jwtDecode(token);
+  const userId = decodedToken.UserId || decodedToken.userId;
+
+  try {
+    const res = await fetch(`http://localhost:5222/api/UserFavoriteMovies/${userId}`);
+    const data = await res.json();
+    isFavorite.value = data.some(f => f.movieId === Number(id));
+  } catch (err) {
+    console.error("Error checking favorite status:", err);
+  }
+};
 
 const confirmRent = async () => {
   const copy = copies.value.find(c => c.id === selectedCopyId.value);
   if (!copy || !returnDate.value) {
     emitter.emit("toast", {
-      message: "⚠️ Please select a copy and return date.",
+      message: "sPlease select a copy and return date.",
       type: "error"
     });
     return;
@@ -199,16 +214,16 @@ const userId = decodedToken.UserId;
     const responseText = await res.text();
 
     if (!res.ok) {
-      console.error('❌ Rent error:', responseText);
+      console.error('Rent error:', responseText);
       emitter.emit("toast", {
-        message: "❌ Rent failed: " + responseText,
+        message: "Rent failed: " + responseText,
         type: "error"
       });
       return;
     }
 
     emitter.emit("toast", {
-      message: `✅ Movie rented successfully until ${returnDate.value}`,
+      message: `Movie rented successfully until ${returnDate.value}`,
       type: "success"
     });
 
@@ -219,9 +234,9 @@ const userId = decodedToken.UserId;
     returnDate.value = null;
 
   } catch (err) {
-    console.error("❌ Rent request failed:", err);
+    console.error("Rent request failed:", err);
     emitter.emit("toast", {
-      message: "❌ Could not process rental. Try again later.",
+      message: "Could not process rental. Try again later.",
       type: "error"
     });
   }
@@ -231,12 +246,78 @@ const isFavorite = computed(() => {
   return movie.value && userStore.user.favoriteMovies.includes(movie.value.id);
 });
 
-const toggleFavorite = () => {
-  if (movie.value) {
-    userStore.toggleFavorite(movie.value.id);
-    localStorage.setItem('favorites', JSON.stringify(userStore.user.favoriteMovies));
+const toggleFavorite = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    emitter.emit("toast", {
+      message: "You must be logged in to use favorites.",
+      type: "error"
+    });
+    return;
   }
+
+  const decodedToken = jwtDecode(token);
+  const userId = decodedToken.UserId || decodedToken.userId;
+
+  if (isFavorite.value) {
+    // DELETE
+    try {
+      const res = await fetch(`http://localhost:5222/api/UserFavoriteMovies/${userId}/${movie.value.id}`, {
+        method: "DELETE"
+      });
+
+      if (!res.ok) throw new Error("Failed to remove favorite");
+
+      isFavorite.value = false;
+      emitter.emit("toast", {
+        message: "Removed from favorites.",
+        type: "success"
+      });
+
+    } catch (err) {
+      console.error("Error removing favorite:", err);
+      emitter.emit("toast", {
+        message: "Failed to remove from favorites.",
+        type: "error"
+      });
+    }
+
+  } else {
+    // POST
+    const payload = {
+      userId: userId,
+      movieId: movie.value.id,
+      movieTitle: movie.value.title,
+      moviePoster: movie.value.imageUrl
+    };
+
+    try {
+      const res = await fetch(`http://localhost:5222/api/UserFavoriteMovies`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error("Failed to add favorite");
+
+      isFavorite.value = true;
+      emitter.emit("toast", {
+        message: "Added to favorites.",
+        type: "success"
+      });
+
+    }     catch (err) {
+    console.error("Error adding favorite:", err);
+    emitter.emit("toast", {
+      message: "Failed to add to favorites.",
+      type: "error"
+    });
+  }
+}
 };
+
 
 const submitReview = async () => {
   if (!newReview.value.comment || !newReview.value.rating) {
@@ -323,6 +404,7 @@ const reviews = ref([]);
 const rental = ref([]);
 
 onMounted(async () => {
+  fetchFavoriteStatus()
   fetch(`http://localhost:5222/api/MovieRatings`)
     .then(res => res.json())
     .then(data => {
