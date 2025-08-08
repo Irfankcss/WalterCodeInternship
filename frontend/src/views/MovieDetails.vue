@@ -25,7 +25,7 @@
               </div>
             </div>
 
-            <p class="movie-description">{{ movie.backText }}</p>
+            <p class="movie-description">{{ movie.description }}</p>
 
             <div class="action-buttons mb-3">
               <button class="btn btn-rent" @click="toggleShowCopies">
@@ -72,7 +72,7 @@
         <div class="col-md-8">
           <section class="movie-section">
             <h2 class="section-title">Description</h2>
-            <p>{{ movie.frontText }}</p>
+            <p>{{ movie.description }}</p>
           </section>
 
           <section class="movie-section">
@@ -444,6 +444,7 @@ onMounted(async () => {
         title: data.name,
         imageUrl: data.poster,
         publishedYear: data.year,
+        description: data.description || data.decs || data.backText || data.frontText || 'No description available',
         backText: data.backText || '',
         frontText: data.frontText || '',
         genre: data.genre || '',

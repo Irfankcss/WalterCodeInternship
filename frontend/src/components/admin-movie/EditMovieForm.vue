@@ -26,26 +26,30 @@
             </div>
             <div class="mb-3">
               <label class="form-label">IMDb Rating</label>
-              <input type="number" step="0.1" class="form-control" v-model="editedMovie.imdbRating"/>
+              <input type="number" step="0.1" class="form-control" v-model="editedMovie.imdbRating" />
             </div>
             <div class="mb-3">
-              <label class="form-label">Poster URL</label>
-              <input type="text" class="form-control" v-model="editedMovie.poster"/>
+              <label class="form-label">Description</label>
+              <input type="text" class="form-control" v-model="editedMovie.description" />
             </div>
-
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" @click="$emit('cancel')">Cancel</button>
-              <button type="submit" class="btn btn-primary">Save Changes</button>
-            </div>
-          </form>
+        <div class="mb-3">
+          <label class="form-label">Poster URL</label>
+          <input type="text" class="form-control" v-model="editedMovie.poster" />
         </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="$emit('cancel')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+        </form>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
 <script setup>
-import {ref} from 'vue'
+import { ref } from 'vue'
 import emitter from "@/utils/emitter.js";
 const props = defineProps({
   movie: Object
@@ -77,7 +81,7 @@ const submitEdit = async () => {
     emit('updated')
   } catch (error) {
     emitter.emit('toast', {
-      message:'Failed to update movie' + " (" + error.message + ")",
+      message: 'Failed to update movie' + " (" + error.message + ")",
       type: 'error'
     })
   }

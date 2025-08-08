@@ -10,6 +10,7 @@ const movie = ref({
   imdbId: '',
   imdbRating: 0,
   poster: '',
+  description: '',
   directorId: 0,
   editedById: 0,
   actorIds: [],
@@ -85,6 +86,10 @@ const submitMovie = () => {
             <div class="form-group mb-3">
               <label>IMDb Rating</label>
               <input type="number" step="0.1" v-model="movie.imdbRating" class="form-control" required />
+            </div>
+            <div>
+              <label>Description</label>
+              <input typw="text" v-model="movie.description" class="form-control mb-3" />
             </div>
             <div class="form-group mb-3">
               <label>Poster URL</label>

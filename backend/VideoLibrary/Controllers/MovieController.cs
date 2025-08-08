@@ -129,6 +129,7 @@ namespace VideoLibrary.Controllers
                 ImdbId = dto.ImdbId,
                 ImdbRating = dto.ImdbRating,
                 Poster = dto.Poster,
+                Description = dto.Description,
                 DirectorId = dto.DirectorId,
                 EditedById = dto.EditedById
             };
