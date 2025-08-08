@@ -65,19 +65,29 @@ namespace VideoLibrary.Controllers
 
             return rental;
         }
-
         // POST: api/rental
         // Creates a rental using only ID references for users and movie copy
         [HttpPost]
         public async Task<ActionResult<Rental>> Create([FromBody] RentalCreateDto dto)
         {
+            var now = DateTime.Now;
+            var hasActive = await _context.Rentals
+                .AnyAsync(r => r.MovieCopyId == dto.MovieCopyId
+                               && !r.IsDeleted
+                               && r.ReturnDate >= now);
+
+            if (hasActive)
+            {
+                return Conflict("This copy is already rented and has not been returned yet.");
+            }
+
             var rental = new Rental
             {
-                Date = DateTime.Now,
+                Date = now,
                 ReturnDate = dto.ReturnDate,
                 BorrowedToId = dto.BorrowedToId,
                 MovieCopyId = dto.MovieCopyId,
-                BorrowedById = 1
+                BorrowedById = 1 
             };
 
             _context.Rentals.Add(rental);

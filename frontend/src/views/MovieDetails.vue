@@ -28,28 +28,34 @@
             <p class="movie-description">{{ movie.description }}</p>
 
             <div class="action-buttons mb-3">
-              <button class="btn btn-rent" @click="toggleShowCopies">
-                {{ showCopies ? 'Cancel' : 'Rent movie' }}
-              </button>
-              <button class="btn btn-favorite" :class="{ active: isFavorite }" @click="toggleFavorite">
-                {{ isFavorite ? '★ Remove from favorites' : '☆ Add to favorites' }}
-              </button>
+<button class="btn btn-rent" @click="() => { if (!isLoggedIn) { emitter.emit('toast', { message: 'You must be logged in to rent movies.', type: 'error' }); return; } toggleShowCopies(); }" :disabled="!copies.length || !isLoggedIn"
+  :class="{ 'opacity-50 cursor-not-allowed': !copies.length || !isLoggedIn }">
+  {{ showCopies ? 'Cancel' : 'Rent movie' }}
+</button>
+
+<button class="btn btn-favorite" @click="() => { if (!isLoggedIn) { emitter.emit('toast', { message: 'You must be logged in to manage favorites.', type: 'error' }); return; } toggleFavorite(); }" :disabled="!isLoggedIn"
+  :class="{ active: isFavorite, 'opacity-50 cursor-not-allowed': !isLoggedIn }">
+  {{ isFavorite ? '★ Remove from favorites' : '☆ Add to favorites' }}
+</button>
               <router-link to="/movies" class="btn btn-back">
                 Back to movie list
               </router-link>
+            </div>
+            <div v-if="!isLoggedIn" class="alert alert-warning">
+              🔒 Please log in to leave a comment and rating.
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div v-if="showCopies && copies.length" class="container mt-4">
-      <h5>Choose a copy and return date (max 14 days):</h5>
+
+    <div v-if="showCopies" class="container mt-4">
+      <h5>Choose a copy and return date (maximum 14 days):</h5>
 
       <div class="d-flex flex-wrap gap-3">
-        <div v-for="copy in copies" :key="copy.id" class="card"
-          :class="{ 'border-primary': selectedCopyId === copy.id }" style="width: 18rem; cursor: pointer;"
-          @click="selectedCopyId = copy.id">
+        <div v-for="copy in availableCopies" :key="copy.id" class="card"
+          :class="{ 'border-primary': selectedCopyId === copy.id }" @click="selectedCopyId = copy.id">
           <div class="card-body">
             <h5 class="card-title">Serial Number: {{ copy.serialNumber }}</h5>
             <p class="card-text">{{ copy.description || 'No description.' }}</p>
@@ -57,14 +63,18 @@
         </div>
       </div>
 
-      <div class="mt-3">
-        <label>Return date:</label>
-        <input type="date" v-model="returnDate" :min="today" :max="maxReturnDate"
-          class="form-control w-auto d-inline-block ms-2">
-        <button class="btn btn-success ms-3" @click="confirmRent" :disabled="!selectedCopyId || !returnDate">
-          Confirm rental
-        </button>
+      <div v-if="!availableCopies.length" class="alert alert-info mt-3">
+        All copies are currently rented out.
       </div>
+    </div>
+
+    <div v-if="showCopies && availableCopies.length" class="mt-3">
+      <label>Return date:</label>
+      <input type="date" v-model="returnDate" :min="today" :max="maxReturnDate"
+        class="form-control w-auto d-inline-block ms-2">
+      <button class="btn btn-success ms-3" @click="confirmRent" :disabled="!selectedCopyId || !returnDate">
+        Confirm rental
+      </button>
     </div>
 
     <div class="movie-content container">
@@ -87,7 +97,8 @@
 
           <section class="movie-section">
             <h2 class="section-title">Comments and Ratings</h2>
-            <div class="mb-3">
+            <div v-if="isLoggedIn && !reviews.some(r => r.userId === currentUserId || r.userID === currentUserId)"
+              class="mb-3">
               <textarea v-model="newReview.comment" class="form-control mb-2"
                 placeholder="Write a comment..."></textarea>
               <select v-model.number="newReview.rating" class="form-control mb-2">
@@ -96,9 +107,15 @@
               </select>
               <button class="btn btn-success" @click="submitReview">Add review</button>
             </div>
+            <div v-if="!isLoggedIn" class="alert alert-warning">
+              🔒 Please log in to leave a comment and rating.
+            </div>
+            <div v-else class="alert alert-info">
+              You have already submitted a review for this movie.
+            </div>
 
             <div v-if="reviews.length">
-              <div v-for="(review,index) in reviews" :key="index" class="mb-3 border p-3 rounded">
+              <div v-for="(review, index) in reviews" :key="index" class="mb-3 border p-3 rounded">
                 <p class="mb-1"><strong>Rating:</strong> {{ review.rating }}/5</p>
                 <p class="mb-0"><em>{{ review.comment }}</em></p>
               </div>
@@ -126,6 +143,7 @@
   <div v-else class="container mt-4">
     <div class="alert alert-warning">Movie not found</div>
   </div>
+
 </template>
 
 <script setup>
@@ -138,23 +156,52 @@ import emitter from '@/utils/emitter';
 const userStore = useUserStore();
 const route = useRoute();
 const id = route.params.id;
-
+const isLoggedIn = computed(() => !!localStorage.getItem('token'));
 const movie = ref(null);
 const copies = ref([]);
+const hasAnyCopies = computed(() => (copies.value?.length || 0) > 0)
 const newReview = ref({ comment: '', rating: '' });
-
 const selectedCopyId = ref(null);
 const returnDate = ref(null);
 const today = new Date().toLocaleDateString('en-CA');
 const maxReturnDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
+const activeRentals = ref([]);
+const todayIso = () => new Date().toISOString().slice(0, 10);
+
+const isCopyRented = (copyId) => {
+  return activeRentals.value.some(r => r.movieCopyId === copyId && new Date(r.returnDate) >= new Date());
+};
+
+const availableCopies = computed(() => copies.value.filter(c => !isCopyRented(c.id)));
+
+async function fetchActiveRentals() {
+  try {
+    const res = await fetch(`http://localhost:5222/api/Rental`);
+    if (!res.ok) throw new Error('Failed to load rentals');
+    const data = await res.json();
+
+    activeRentals.value = data.filter(r =>
+      copies.value.some(c => c.id === r.movieCopyId) &&
+      new Date(r.returnDate) >= new Date() &&
+      !r.isDeleted
+    );
+  } catch (err) {
+    console.error('Error loading rentals', err);
+  }
+}
+
 const showCopies = ref(false);
-const toggleShowCopies = () => {
+
+const toggleShowCopies = async () => {
   showCopies.value = !showCopies.value;
   selectedCopyId.value = null;
   returnDate.value = null;
-};
 
+  if (showCopies.value) {
+    await fetchActiveRentals();
+  }
+};
 const fetchCopies = async () => {
   try {
     const res = await fetch(`http://localhost:5222/api/Movie/${id}`);
@@ -184,15 +231,15 @@ const confirmRent = async () => {
   const copy = copies.value.find(c => c.id === selectedCopyId.value);
   if (!copy || !returnDate.value) {
     emitter.emit("toast", {
-      message: "sPlease select a copy and return date.",
+      message: "Please select a copy and return date.",
       type: "error"
     });
     return;
   }
 
-const token = localStorage.getItem('token');
-const decodedToken = jwtDecode(token);
-const userId = decodedToken.UserId;
+  const token = localStorage.getItem('token');
+  const decodedToken = jwtDecode(token);
+  const userId = decodedToken.UserId;
 
   const payload = {
     movieId: Number(id),
@@ -228,6 +275,7 @@ const userId = decodedToken.UserId;
     });
 
     await fetchCopies();
+    await fetchActiveRentals();
 
     showCopies.value = false;
     selectedCopyId.value = null;
@@ -240,6 +288,7 @@ const userId = decodedToken.UserId;
       type: "error"
     });
   }
+
 };
 
 const isFavorite = ref(false);
@@ -647,5 +696,13 @@ onMounted(async () => {
 
 .btn-rate:hover {
   background-color: #218838;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-not-allowed {
+  cursor: not-allowed;
 }
 </style>

@@ -22,7 +22,8 @@ const selectedModel = ref('movies')
         <a class="nav-link" :class="{ active: selectedModel === 'actors' }" @click="selectedModel = 'actors'">Actors</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" :class="{ active: selectedModel === 'directors' }" @click="selectedModel = 'directors'">Directors</a>
+        <a class="nav-link" :class="{ active: selectedModel === 'directors' }"
+          @click="selectedModel = 'directors'">Directors</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" :class="{ active: selectedModel === 'users' }" @click="selectedModel = 'users'">Users</a>
@@ -37,7 +38,7 @@ const selectedModel = ref('movies')
   </div>
 </template>
 <style scoped>
-li{
+li {
   cursor: pointer;
 }
 </style>
