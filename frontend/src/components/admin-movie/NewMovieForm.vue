@@ -89,7 +89,7 @@ const submitMovie = () => {
             </div>
             <div>
               <label>Description</label>
-              <input typw="text" v-model="movie.description" class="form-control mb-3" />
+              <input type="text" v-model="movie.description" class="form-control mb-3" />
             </div>
             <div class="form-group mb-3">
               <label>Poster URL</label>

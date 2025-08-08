@@ -242,9 +242,7 @@ const userId = decodedToken.UserId;
   }
 };
 
-const isFavorite = computed(() => {
-  return movie.value && userStore.user.favoriteMovies.includes(movie.value.id);
-});
+const isFavorite = ref(false);
 
 const toggleFavorite = async () => {
   const token = localStorage.getItem('token');
@@ -260,9 +258,8 @@ const toggleFavorite = async () => {
   const userId = decodedToken.UserId || decodedToken.userId;
 
   if (isFavorite.value) {
-    // DELETE
     try {
-      const res = await fetch(`http://localhost:5222/api/UserFavoriteMovies/${userId}/${movie.value.id}`, {
+      const res = await fetch(`http://localhost:5222/api/UserFavoriteMovies?userId=${userId}&movieId=${movie.value.id}`, {
         method: "DELETE"
       });
 
@@ -308,15 +305,16 @@ const toggleFavorite = async () => {
         type: "success"
       });
 
-    }     catch (err) {
-    console.error("Error adding favorite:", err);
-    emitter.emit("toast", {
-      message: "Failed to add to favorites.",
-      type: "error"
-    });
+    } catch (err) {
+      console.error("Error adding favorite:", err);
+      emitter.emit("toast", {
+        message: "Failed to add to favorites.",
+        type: "error"
+      });
+    }
   }
-}
 };
+
 
 
 const submitReview = async () => {

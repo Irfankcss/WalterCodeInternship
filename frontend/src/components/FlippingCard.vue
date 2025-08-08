@@ -18,7 +18,9 @@
         <div class="card-block">
           <h4 class="card-title">{{ title }}</h4>
           <p class="card-text"><small class="text-muted">{{ director }} ({{ publishedYear }})</small></p>
-          <p class="card-text">{{ description }}</p>
+          <p class="card-text">
+            {{ description && description.length > 90 ? description.substring(0, 90) + '...' : description }}
+          </p>
           <router-link :to="{ name: 'MovieDetails', params: { id: movieId } }" class="btn btn-primary">
             Details
           </router-link>
@@ -35,7 +37,7 @@ defineProps({
     type: [String, Number],
     required: true
   },
-  
+
   description: {
     type: String,
     default: 'No description available',

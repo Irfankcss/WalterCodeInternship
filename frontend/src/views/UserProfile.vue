@@ -124,7 +124,8 @@ const user = reactive({
   rentals: []
 })
 
-const UniversalImage = ref('https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png')
+//http://localhost:5173/static/sbadmin/img/undraw_profile.svg
+const UniversalImage = ref('static/sbadmin/img/undraw_profile.svg')
 const isEditing = ref(false)
 const successMessage = ref('')
 const tempAvatar = ref('')
