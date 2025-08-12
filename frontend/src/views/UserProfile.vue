@@ -3,7 +3,7 @@
     <div class="card profile-card shadow-lg p-4">
       <div class="row align-items-center">
         <div class="col-md-4 profile-left text-center">
-          <img :src= UniversalImage alt="Avatar" class="rounded-circle avatar-img mb-3" />
+          <img :src=UniversalImage alt="Avatar" class="rounded-circle avatar-img mb-3" />
           <h4 class="text-primary fw-bold mb-0">{{ user.name }}</h4>
           <p class="text-muted">@{{ user.username }}</p>
         </div>
@@ -19,10 +19,10 @@
           <form v-if="isEditing" @submit.prevent="saveChanges">
             <div class="mb-3" v-for="(label, key) in formLabels" :key="key">
               <label class="form-label">{{ label }} *</label>
-              <input :type="key === 'email' ? 'email' : key === 'dob' ? 'date' : 'text'"
-                     v-model="form[key]" class="form-control" required />
+              <input :type="key === 'email' ? 'email' : key === 'dob' ? 'date' : 'text'" v-model="form[key]"
+                class="form-control" required />
             </div>
-              <button type="submit" class="btn btn-success">Save Changes</button>
+            <button type="submit" class="btn btn-success">Save Changes</button>
           </form>
 
           <div v-else>
@@ -53,10 +53,7 @@
             <img :src="movie.moviePoster" class="card-img-top" alt="Poster" />
             <div class="card-body">
               <h5 class="card-title">{{ movie.movieTitle }}</h5>
-              <router-link
-                :to="{ name: 'MovieDetails', params: { id: movie.movieId } }"
-                class="btn btn-primary btn-sm"
-              >
+              <router-link :to="{ name: 'MovieDetails', params: { id: movie.movieId } }" class="btn btn-primary btn-sm">
                 Details
               </router-link>
             </div>
@@ -65,8 +62,6 @@
       </div>
     </div>
 
-
-    <!-- Rental History Section -->
     <div v-if="showHistory" class="mt-5">
       <h4 class="mb-3">Currently Rented</h4>
       <table v-if="activeRentals.length" class="table table-bordered">
@@ -110,227 +105,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
-import jwtDecode from 'jwt-decode'
+import '@/features/user/styles/UserProfile.css'
+import { useUserProfile } from '@/features/user/composables/useUserProfile'
 
-const user = reactive({
-  id: null,
-  name: '',
-  username: '',
-  email: '',
-  dob: '',
-  avatarUrl: '',
-  favoriteMovies: [],
-  rentals: []
-})
-
-//http://localhost:5173/static/sbadmin/img/undraw_profile.svg
-const UniversalImage = ref('static/sbadmin/img/undraw_profile.svg')
-const isEditing = ref(false)
-const successMessage = ref('')
-const tempAvatar = ref('')
-const showHistory = ref(false)
-let userId = null
-
-
-const form = reactive({
-  name: '',
-  username: '',
-  email: '',
-  dob: ''
-})
-
-
-const toggleEdit = () => {
-  if (isEditing.value) {
-    Object.assign(form, user)
-    tempAvatar.value = user.avatarUrl
-  }
-  isEditing.value = !isEditing.value
-}
-
-const saveChanges = async () => {
-  if (!form.name || !form.username || !form.email || !form.dob) {
-    alert('Please fill in all required fields.')
-    return
-  }
-
-  const token = localStorage.getItem('token')
-  if (!token) return
-
-
-
-  const updatedData = {
-    name: form.name,
-    username: form.username,
-    email: form.email,
-    dob: new Date(form.dob).toISOString(),
-    admin: user.admin
-  }
-
-  try {
-    const response = await fetch(`http://localhost:5222/api/User/${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(updatedData)
-    })
-
-    if (!response.ok) throw new Error('Failed to update user')
-
-    let updatedUser = {}
-    const text = await response.text()
-    if (text) updatedUser = JSON.parse(text)
-
-    Object.assign(user, updatedUser)
-    Object.assign(form, updatedUser)
-    tempAvatar.value = updatedUser.avatarUrl || ''
-    emitter.emit("toast", {message: "Profile updated successfully.", type: "success"})
-    isEditing.value = false
-    await fetchUserProfile()
-  } catch (err) {
-    emitter.emit("toast", {message: "Failed to update profile." + err.message, type: "error"})
-  }
-}
-
-const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-GB')
-
-const formLabels = {
-  name: 'Full Name',
-  username: 'Username',
-  email: 'Email',
-  dob: 'Date of Birth'
-}
-
-const fetchUserProfile = async () => {
-  const token = localStorage.getItem('token')
-  if (!token) return
-  const decoded = jwtDecode(token)
-  const userId = Number(decoded.UserId)
-
-  try {
-    const response = await fetch(`http://localhost:5222/api/User/${userId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-
-    if (!response.ok) throw new Error('Failed to fetch user')
-
-    const data = await response.json()
-    Object.assign(user, data)
-    Object.assign(form, data)
-    tempAvatar.value = data.avatarUrl || ''
-  } catch (err) {
-    console.error('Error fetching user:', err)
-  }
-}
-
-onMounted(() => {
-
-  const token = localStorage.getItem('token')
-  if(!token)window.location.href = "/login"
-  const decoded = jwtDecode(token)
-  userId = Number(decoded.UserId)
-
-  fetchUserProfile()
-  fetchRentals()
-  fetchFavorites();
-
-})
-
-const fetchRentals = async () => {
-  try {
-    const response = await fetch('http://localhost:5222/api/Rental', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    if (!response.ok) throw new Error('Failed to fetch rentals')
-
-    const data = await response.json()
-    user.rentals = await data.filter(r => r.borrowedToId === userId)
-  } catch (err) {
-    console.error('Error fetching rentals:', err)
-  }
-}
-
-import { mockMovies } from '@/seeders/userData'
-import emitter from "@/utils/emitter.js";
-
-const favoriteMoviesList = ref([]);
-const fetchFavorites = async () => {
-  const token = localStorage.getItem('token');
-  if (!token) return;
-
-  const decoded = jwtDecode(token);
-  const userId = decoded.UserId || decoded.userId;
-
-  try {
-    const response = await fetch(`http://localhost:5222/api/UserFavoriteMovies/${userId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    if (!response.ok) throw new Error('Failed to fetch favorites');
-    const data = await response.json();
-
-    favoriteMoviesList.value = data;
-  } catch (err) {
-    console.error('Error fetching favorites:', err);
-  }
-};
-
-
-const today = new Date()
-today.setHours(0, 0, 0, 0)
-
-const activeRentals = computed(() =>
-  user.rentals?.filter(r => {
-    const rentedDate = new Date(r.returnDate)
-    rentedDate.setHours(0, 0, 0, 0)
-    return rentedDate >= today
-  }) || []
-)
-
-const pastRentals = computed(() =>
-  user.rentals?.filter(r => {
-    const rentedDate = new Date(r.returnDate)
-    rentedDate.setHours(0, 0, 0, 0)
-    return rentedDate < today
-  }) || []
-)
+const {
+  user, UniversalImage, isEditing, successMessage, tempAvatar, showHistory,
+  form, formLabels, favoriteMoviesList,
+  toggleEdit, saveChanges, formatDate,
+  activeRentals, pastRentals
+} = useUserProfile()
 </script>
 
-
-
-<style scoped>
-.profile-card {
-  background-color: #ffffff;
-  border-radius: 1rem;
-  padding: 2rem;
-  min-height: 300px;
-}
-
-.profile-left {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.avatar-img {
-  width: 180px;
-  height: 180px;
-  object-fit: cover;
-  border: 4px solid #dee2e6;
-}
-
-.card-img-top {
-  height: 350px;
-  object-fit: cover;
-}
-</style>

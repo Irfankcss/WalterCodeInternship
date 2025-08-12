@@ -15,19 +15,9 @@
         <option value="rating">Rating</option>
       </select>
 
-      <FlippingCard
-        v-for="movie in filteredMovies"
-        :key="movie.id"
-        :movieId="movie.id"
-        :imageUrl="movie.poster"
-        :title="movie.name"
-        :director="movie.director.name"
-        :publishedYear="movie.year"
-        :imdbRating="movie.imdbRating"
-        :description="movie.description"
-        :link="movie.link"
-        :linkTitle="movie.linkTitle"
-      />
+      <FlippingCard v-for="movie in filteredMovies" :key="movie.id" :movieId="movie.id" :imageUrl="movie.poster"
+        :title="movie.name" :director="movie.director.name" :publishedYear="movie.year" :imdbRating="movie.imdbRating"
+        :description="movie.description" :link="movie.link" :linkTitle="movie.linkTitle" />
     </div>
   </div>
 </template>
@@ -67,11 +57,9 @@ const filteredMovies = computed(() => {
 
 onMounted(async () => {
   try {
-    // Dohvati filmove
     const movieRes = await fetch('http://localhost:5222/api/Movie');
     const movieData = await movieRes.json();
 
-    // Za svaki film dohvati žanrove
     for (const movie of movieData) {
       try {
         const genreRes = await fetch(`http://localhost:5222/api/Movie/${movie.id}/genres`);
@@ -84,7 +72,6 @@ onMounted(async () => {
 
     movies.value = movieData;
 
-    // Dohvati listu svih žanrova
     const genreRes = await fetch('http://localhost:5222/api/Genre');
     const genreList = await genreRes.json();
     genres.value = genreList;
@@ -98,6 +85,7 @@ onMounted(async () => {
 .container {
   margin-top: 2rem;
 }
+
 .row {
   display: flex;
   flex-wrap: wrap;
