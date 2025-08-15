@@ -80,7 +80,7 @@ defineProps({
 /* Flip Cards CSS */
 .card-container {
   display: grid;
-  perspective: 700px;
+  perspective: 750px;
 }
 
 .card-block {
@@ -92,7 +92,7 @@ defineProps({
   grid-template: 1fr / 1fr;
   grid-template-areas: "frontAndBack";
   transform-style: preserve-3d;
-  transition: all 0.7s ease;
+  transition: all 0.9s ease;
 }
 
 .card-flip div {
