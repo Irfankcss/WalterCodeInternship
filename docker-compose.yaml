@@ -15,9 +15,6 @@ services:
       - ConnectionStrings__DefaultConnection=server=db;port=3306;database=videolibrary;user=appuser;password=lozinka123
     depends_on:
       - db
-    command: >
-      sh -c "dotnet ef database update &&
-             dotnet VideoLibrary.dll"
 
   db:
     image: mariadb:10.11
