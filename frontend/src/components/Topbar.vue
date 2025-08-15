@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+  <nav class="navbar navbar-expand navbar-light topbar mb-4 static-top shadow" :style="{ backgroundColor: isAdmin() ? '#0a1c21' : '#162146' }">
     <!-- Sidebar Toggle (Topbar) -->
     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
       <i class="fa fa-bars"></i>
@@ -72,6 +72,7 @@
 import { ref, onMounted } from 'vue'
 import jwtDecode from "jwt-decode"
 import emitter from "@/utils/emitter.js"
+import isAdmin from "@/utils/auth.js";
 
 const username = ref("")
 const isLoggedin = ref(false)
@@ -106,5 +107,8 @@ const logout = () => {
   width: 40px;
   height: 40px;
   object-fit: cover;
+}
+nav.navbar {
+  margin-bottom: 0 !important;
 }
 </style>

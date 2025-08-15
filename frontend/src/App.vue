@@ -4,6 +4,7 @@ import Topbar from './components/Topbar.vue'
 import Footer from './components/Footer.vue'
 import { RouterView, useRoute } from 'vue-router'
 import Toast from "@/components/Toast.vue";
+import Home from "@/components/Home.vue";
 const route = useRoute()
 </script>
 
@@ -18,7 +19,6 @@ const route = useRoute()
       <div id="content">
         <Topbar />
         <div class="container-fluid">
-
           <RouterView />
         </div>
       </div>

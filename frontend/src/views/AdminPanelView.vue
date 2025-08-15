@@ -12,6 +12,7 @@ const selectedModel = ref('movies')
 
 <template>
   <div class="container-fluid">
+    <h1 class="text-center my-4">Admin panel</h1>
     <ul class="nav nav-tabs mb-4">
       <li class="nav-item">
         <a class="nav-link" :class="{ active: selectedModel === 'movies' }" @click="selectedModel = 'movies'">Movies</a>
