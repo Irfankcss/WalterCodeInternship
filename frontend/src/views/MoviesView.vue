@@ -1,25 +1,25 @@
 <template>
   <h1 class="text-center my-4">Movies</h1>
-  <div class="container">
-    <div class="row">
-      <input type="text" v-model="searchQuery" placeholder="Search movies..." class="form-control mb-3" />
+  <div class="filters-row mb-3">
+  <input type="text" v-model="searchQuery" placeholder="Search movies..." class="form-control" />
 
-      <select v-model="selectedGenre" class="form-control mb-3">
-        <option value="">All genres</option>
-        <option v-for="genre in genres" :key="genre.id" :value="genre.name">{{ genre.name }}</option>
-      </select>
+  <select v-model="selectedGenre" class="form-select">
+    <option value="">All genres</option>
+    <option v-for="genre in genres" :key="genre.id" :value="genre.name">{{ genre.name }}</option>
+  </select>
 
-      <select v-model="sortBy" class="form-control mb-3">
-        <option value="name">Title</option>
-        <option value="year">Year</option>
-        <option value="rating">Rating</option>
-      </select>
+  <select v-model="sortBy" class="form-select">
+    <option value="name">Title</option>
+    <option value="year">Year</option>
+    <option value="rating">Rating</option>
+  </select>
+</div>
 
+<div class="flipping-cards-container">
       <FlippingCard v-for="movie in filteredMovies" :key="movie.id" :movieId="movie.id" :imageUrl="movie.poster"
         :title="movie.name" :director="movie.director.name" :publishedYear="movie.year" :imdbRating="movie.imdbRating"
         :description="movie.description" :link="movie.link" :linkTitle="movie.linkTitle" />
-    </div>
-  </div>
+</div>
 </template>
 
 <script setup>
@@ -87,6 +87,24 @@ onMounted(async () => {
 }
 
 .row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.filters-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.filters-row .form-control,
+.filters-row .form-select {
+  flex: 1;
+  min-width: 140px;
+}
+
+.flipping-cards-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
