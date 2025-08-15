@@ -23,7 +23,7 @@ const routes = router.options.routes.filter(route => {
       <div class="sidebar-brand-icon rotate-n-15">
         <i class="fas fa-video"></i>
       </div>
-      <div class="sidebar-brand-text mx-3">VideoLibrary <sup>0.0.1</sup></div>
+      <div class="sidebar-brand-text mx-3">VideoLibrary <sup>0.0.9</sup></div>
     </a>
 
     <hr class="sidebar-divider my-0">

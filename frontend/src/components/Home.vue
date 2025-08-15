@@ -18,18 +18,9 @@ function goToMovies() {
 </template>
 
 <style scoped>
-:global(.container-fluid),
-:global(.container) {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-:global(body) {
-  margin: 0;
-  padding: 0;
-}
 
 .home-wrapper {
+  margin: 20px 20px 20px 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
