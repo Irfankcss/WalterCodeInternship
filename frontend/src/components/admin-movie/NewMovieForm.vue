@@ -2,6 +2,9 @@
 import { ref, onMounted } from 'vue'
 import emitter from "@/utils/emitter.js";
 import jwtDecode from "jwt-decode";
+import NewActorForm from '../admin-actor/NewActorForm.vue'
+import NewDirectorForm from '../admin-director/NewDirectorForm.vue' // dodano
+
 const emit = defineEmits(['submitted', 'cancel'])
 
 const movie = ref({
@@ -21,24 +24,48 @@ const directors = ref([])
 const actors = ref([])
 const genres = ref([])
 
-onMounted(() => {
+const showActorForm = ref(false)
+const showDirectorForm = ref(false) // dodano
+
+const fetchDirectors = () => {
   fetch('http://localhost:5222/api/Director')
     .then(res => res.json())
     .then(data => directors.value = data)
+}
 
+const fetchActors = () => {
   fetch('http://localhost:5222/api/Actor')
     .then(res => res.json())
     .then(data => actors.value = data)
+}
 
+const fetchGenres = () => {
   fetch('http://localhost:5222/api/Genre')
     .then(res => res.json())
     .then(data => genres.value = data)
+}
+
+const handleActorSubmitted = () => {
+  fetchActors()
+  showActorForm.value = false
+}
+
+const handleDirectorSubmitted = () => { // dodano
+  fetchDirectors()
+  showDirectorForm.value = false
+}
+
+onMounted(() => {
+  fetchDirectors()
+  fetchActors()
+  fetchGenres()
 })
 
 const submitMovie = () => {
   const token = localStorage.getItem('token')
   const decodedToken = jwtDecode(token)
   movie.value.editedById = decodedToken.UserId
+
   fetch('http://localhost:5222/api/Movie', {
     method: 'POST',
     headers: {
@@ -58,9 +85,13 @@ const submitMovie = () => {
         type: 'success'
       })
     })
-    .catch(err => emitter.emit('toast', { message: "Failed to add movie (" + err.message + ")", type: 'error' }))
+    .catch(err => emitter.emit('toast', {
+      message: "Failed to add movie (" + err.message + ")",
+      type: 'error'
+    }))
 }
 </script>
+
 <template>
   <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
@@ -103,6 +134,9 @@ const submitMovie = () => {
                   {{ d.name }}
                 </option>
               </select>
+              <button type="button" class="btn btn-warning mt-2" @click="showDirectorForm = true">
+                Add new Director
+              </button>
             </div>
             <div class="form-group mb-3">
               <label>Actors</label>
@@ -113,6 +147,9 @@ const submitMovie = () => {
                   {{ a.name }}
                 </label>
               </div>
+              <button type="button" class="btn btn-warning mt-2" @click="showActorForm = true">
+                Add new Actor
+              </button>
             </div>
             <div class="form-group mb-3">
               <label>Genres</label>
@@ -133,6 +170,18 @@ const submitMovie = () => {
       </div>
     </div>
   </div>
+
+  <NewActorForm
+    v-if="showActorForm"
+    @submitted="handleActorSubmitted"
+    @cancel="showActorForm = false"
+  />
+
+  <NewDirectorForm
+    v-if="showDirectorForm"
+    @submitted="handleDirectorSubmitted"
+    @cancel="showDirectorForm = false"
+  />
 </template>
 
 <style scoped>
@@ -141,4 +190,3 @@ const submitMovie = () => {
   overflow-y: auto;
 }
 </style>
-

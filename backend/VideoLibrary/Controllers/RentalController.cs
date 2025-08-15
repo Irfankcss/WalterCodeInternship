@@ -29,7 +29,6 @@ namespace VideoLibrary.Controllers
                 .Include(r => r.BorrowedTo)
                 .Include(r => r.MovieCopy)
                     .ThenInclude(mc => mc.Movie)
-                .Where(r => !r.IsDeleted)
                 .Select(r => new RentalDto
                 {
                     Id = r.Id,
@@ -42,6 +41,7 @@ namespace VideoLibrary.Controllers
                     MovieCopyId = r.MovieCopyId,
                     MovieId = r.MovieCopy.MovieId,
                     MovieTitle = r.MovieCopy.Movie.Name
+                    , isDeleted = r.IsDeleted,
                 })
                 .ToListAsync();
 

@@ -5,6 +5,7 @@ import GenreManager from "@/components/admin-genre/GenreManager.vue";
 import ActorManager from "@/components/admin-actor/ActorManager.vue";
 import DirectorManager from "@/components/admin-director/DirectorManager.vue";
 import UserManager from "@/components/admin-user/UserManager.vue";
+import RentalManager from "@/components/admin-rental/RentalManager.vue";
 
 const selectedModel = ref('movies')
 </script>
@@ -28,6 +29,9 @@ const selectedModel = ref('movies')
       <li class="nav-item">
         <a class="nav-link" :class="{ active: selectedModel === 'users' }" @click="selectedModel = 'users'">Users</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" :class="{ active: selectedModel === 'rentals' }" @click="selectedModel = 'rentals'">Rentals</a>
+      </li>
     </ul>
 
     <MovieManager v-if="selectedModel === 'movies'" />
@@ -35,6 +39,7 @@ const selectedModel = ref('movies')
     <ActorManager v-if="selectedModel === 'actors'" />
     <DirectorManager v-if="selectedModel === 'directors'" />
     <UserManager v-if="selectedModel === 'users'" />
+    <RentalManager v-if="selectedModel === 'rentals'" />
   </div>
 </template>
 <style scoped>

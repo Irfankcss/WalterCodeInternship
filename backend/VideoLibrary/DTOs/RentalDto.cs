@@ -12,5 +12,6 @@
         public int? MovieCopyId { get; set; }
         public int? MovieId { get; set; }
         public string MovieTitle { get; set; }
+        public bool isDeleted { get; set; }
     }
 }
