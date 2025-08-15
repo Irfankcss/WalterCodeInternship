@@ -1,0 +1,15 @@
+# Docker i Compose fajlovi
+Dockerfile
+docker-compose.yml
+docker-compose.yaml
+
+# Git
+.git
+.gitignore
+
+# Build output
+bin
+obj
+
+# Ostalo
+node_modules

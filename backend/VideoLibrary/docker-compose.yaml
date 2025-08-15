@@ -1,0 +1,48 @@
+﻿version: '3.8'
+
+services:
+  api:
+    build: .
+    image: videolibraryapi 
+    container_name: videolibraryapi
+    ports:
+      - "5222:5222"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5222
+      - ConnectionStrings__DefaultConnection=server=db;port=3306;database=videolibrary;user=appuser;password=lozinka123
+    depends_on:
+      - db
+    command: >
+      sh -c "dotnet ef database update &&
+             dotnet VideoLibrary.dll"
+
+  db:
+    image: mariadb:10.11
+    container_name: videolibrarydb
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=videolibrary
+      - MYSQL_USER=appuser
+      - MYSQL_PASSWORD=lozinka123
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile
+    image: videolibraryfront
+    container_name: videolibraryfront
+    ports:
+      - "5173:5173"
+    environment:
+      - REACT_APP_API_URL=http://localhost:5222/api
+    restart: unless-stopped
+    depends_on:
+      - api
+
+volumes:
+  db_data:
