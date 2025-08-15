@@ -205,11 +205,11 @@ export function useMovieDetails(movieIdRef) {
     }
 
     try {
-      const savedReview = await postMovieRating(reviewPayload) // vraća parsed JSON
+      const savedReview = await postMovieRating(reviewPayload) 
       reviews.value.push({
         rating: savedReview.rating,
         comment: savedReview.comment,
-        userId
+        userId: currentUserId.value
       })
       newReview.value.comment = ''
       newReview.value.rating = ''

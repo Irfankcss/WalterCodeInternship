@@ -92,7 +92,6 @@
             <h2 class="section-title">Cast</h2>
             <div class="cast-grid">
               <div class="cast-member" v-for="actor in actors" :key="actor.id">
-                <!-- <img :src="actor.image" :alt="actor.name" class="actor-avatar" /> -->
                 <span class="actor-name">{{ actor.name }}</span>
               </div>
             </div>
@@ -113,7 +112,8 @@
             <div v-if="!isLoggedIn" class="alert alert-warning">
               🔒 Please log in to leave a comment and rating.
             </div>
-            <div v-else class="alert alert-info">
+            <div v-else-if="reviews.some(r => r.userId === currentUserId || r.userID === currentUserId)"
+              class="alert alert-info">
               You have already submitted a review for this movie.
             </div>
 
@@ -166,4 +166,3 @@ const {
   submitReview
 } = useMovieDetails(id)
 </script>
-
