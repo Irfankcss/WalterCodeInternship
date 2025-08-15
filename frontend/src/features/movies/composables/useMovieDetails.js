@@ -209,7 +209,7 @@ export function useMovieDetails(movieIdRef) {
       reviews.value.push({
         rating: savedReview.rating,
         comment: savedReview.comment,
-        userId: currentUserId.value
+        userId
       })
       newReview.value.comment = ''
       newReview.value.rating = ''
