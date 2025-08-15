@@ -69,17 +69,15 @@
       <div v-if="!availableCopies.length" class="alert alert-info mt-3">
         All copies are currently rented out.
       </div>
+      <div v-if="showCopies && availableCopies.length" class="mt-3">
+        <label>Return date:</label>
+        <input type="date" v-model="returnDate" :min="today" :max="maxReturnDate"
+          class="form-control w-auto d-inline-block ms-2">
+        <button class="btn btn-success ms-3" @click="confirmRent" :disabled="!selectedCopyId || !returnDate">
+          Confirm rental
+        </button>
+      </div>
     </div>
-
-    <div v-if="showCopies && availableCopies.length" class="mt-3">
-      <label>Return date:</label>
-      <input type="date" v-model="returnDate" :min="today" :max="maxReturnDate"
-        class="form-control w-auto d-inline-block ms-2">
-      <button class="btn btn-success ms-3" @click="confirmRent" :disabled="!selectedCopyId || !returnDate">
-        Confirm rental
-      </button>
-    </div>
-
     <div class="movie-content container">
       <div class="row">
         <div class="col-md-8">
