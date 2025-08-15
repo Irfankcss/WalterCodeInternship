@@ -2,7 +2,9 @@
 
 services:
   api:
-    build: .
+    build:
+      context: ./backend/VideoLibrary
+      dockerfile: Dockerfile
     image: videolibraryapi 
     container_name: videolibraryapi
     ports:
@@ -30,9 +32,10 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+
   frontend:
     build:
-      context: ../../frontend
+      context: ./frontend
       dockerfile: Dockerfile
     image: videolibraryfront
     container_name: videolibraryfront
